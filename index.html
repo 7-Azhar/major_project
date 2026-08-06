@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA - AI-Assisted Drone Intelligence System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 100%);
+            color: #e0e6ed;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(100, 200, 255, 0.2);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #b0b8c1;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            color: #64c8ff;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 60px;
+            background: linear-gradient(135deg, rgba(15,20,25,1) 0%, rgba(26,35,50,1) 50%, rgba(15,40,60,1) 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
+        }
+
+        .hero-content {
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #64c8ff 0%, #ff6b9d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #a8b0ba;
+            margin-bottom: 2rem;
+            animation: slideInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .drone-icon {
+            font-size: 8rem;
+            margin-bottom: 2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #64c8ff 0%, #00d4ff 100%);
+            color: #000;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 2rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(100, 200, 255, 0.4);
+        }
+
+        /* Sections */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: linear-gradient(135deg, #64c8ff 0%, #ff6b9d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(100, 200, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(100, 200, 255, 0.8);
+            box-shadow: 0 20px 40px rgba(100, 200, 255, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #64c8ff;
+        }
+
+        .feature-card p {
+            color: #a8b0ba;
+        }
+
+        /* Architecture Section */
+        .architecture {
+            background: linear-gradient(135deg, rgba(26, 35, 50, 0.5) 0%, rgba(15, 40, 60, 0.5) 100%);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            margin: 2rem 0;
+        }
+
+        .arch-box {
+            background: rgba(100, 200, 255, 0.1);
+            border: 2px solid #64c8ff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            color: #64c8ff;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .arrow {
+            text-align: center;
+            color: #64c8ff;
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, #64c8ff 0%, #ff6b9d 100%);
+        }
+
+        .timeline-item {
+            margin-bottom: 3rem;
+            width: 45%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            margin-left: 0;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            margin-left: 55%;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 15px;
+            background: #64c8ff;
+            border: 3px solid #0f1419;
+            border-radius: 50%;
+        }
+
+        .timeline-content {
+            background: rgba(100, 200, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 3px solid #64c8ff;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            border-left: none;
+            border-right: 3px solid #ff6b9d;
+        }
+
+        /* Status Section */
+        .status-item {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(100, 200, 255, 0.05);
+            border-left: 4px solid #64c8ff;
+        }
+
+        .status-item.completed {
+            border-left-color: #4ade80;
+        }
+
+        .status-item.working {
+            border-left-color: #fbbf24;
+        }
+
+        .status-item.pending {
+            border-left-color: #94a3b8;
+        }
+
+        .status-emoji {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Tech Stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-item {
+            background: rgba(100, 200, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(100, 200, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .tech-item:hover {
+            transform: scale(1.05);
+            border-color: #64c8ff;
+        }
+
+        .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Applications */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .app-item {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.1) 0%, rgba(100, 200, 255, 0.05) 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 107, 157, 0.3);
+            text-align: center;
+        }
+
+        .app-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+            color: #7a8290;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .timeline::before {
+                left: 10px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                margin-left: 40px !important;
+                text-align: left !important;
+            }
+
+            .timeline-dot {
+                left: 0;
+                transform: translateX(-50%);
+            }
+
+            .timeline-content {
+                border-left: 3px solid #64c8ff !important;
+                border-right: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">🚁 AURA</div>
+        <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#timeline">Timeline</a></li>
+            <li><a href="#apps">Applications</a></li>
+            <li><a href="#status">Status</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="drone-icon">🚁</div>
+            <h1>AURA</h1>
+            <p class="hero-subtitle">AI-Assisted Semi-Autonomous Drone with Ground Intelligence</p>
+            <p style="font-size: 1.1rem; color: #a8b0ba; margin-bottom: 2rem;">
+                Keep humans in control while AI provides intelligent assistance through ground-based processing
+            </p>
+            <button class="cta-button">Explore Project</button>
+        </div>
+    </section>
+
+    <!-- Problem & Solution -->
+    <section>
+        <h2 class="section-title">The Problem We Solve</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+            <div>
+                <h3 style="color: #ff6b9d; margin-bottom: 1.5rem; font-size: 1.5rem;">❌ Traditional AI Drones</h3>
+                <ul style="list-style: none;">
+                    <li style="margin: 1rem 0;">⚖️ Heavy onboard computers</li>
+                    <li style="margin: 1rem 0;">🔋 Poor battery efficiency</li>
+                    <li style="margin: 1rem 0;">💰 Expensive hardware</li>
+                    <li style="margin: 1rem 0;">🤖 Risky full autonomy</li>
+                    <li style="margin: 1rem 0;">🔧 Difficult upgrades</li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: #64c8ff; margin-bottom: 1.5rem; font-size: 1.5rem;">✅ AURA Solution</h3>
+                <ul style="list-style: none;">
+                    <li style="margin: 1rem 0;">🪶 Lightweight drone design</li>
+                    <li style="margin: 1rem 0;">⚡ Extended flight time</li>
+                    <li style="margin: 1rem 0;">💡 Cost-effective system</li>
+                    <li style="margin: 1rem 0;">👤 Pilot always in control</li>
+                    <li style="margin: 1rem 0;">🔄 Easy to upgrade</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Features -->
+    <section id="features">
+        <h2 class="section-title">Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📹</div>
+                <h3>Live FPV Processing</h3>
+                <p>Real-time video enhancement and analysis with AI-powered quality improvements</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Object Detection</h3>
+                <p>Detect humans, vehicles, obstacles, fire, and more using advanced YOLO models</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📍</div>
+                <h3>Object Tracking</h3>
+                <p>Multi-object tracking to follow targets continuously across frames</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚠️</div>
+                <h3>Smart Warnings</h3>
+                <p>Intelligent alerts for obstacles, targets, and mission-critical events</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3>Pilot in Control</h3>
+                <p>AI assists but pilot maintains full manual control at all times</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Mission Dashboard</h3>
+                <p>Real-time dashboard showing detection, tracking, and system status</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Architecture -->
+    <section id="architecture">
+        <h2 class="section-title">System Architecture</h2>
+        <div class="architecture">
+            <div class="arch-box">🚁 FPV Drone</div>
+            <div class="arrow">↓ Live Video Feed ↓</div>
+            <div class="arch-box">📡 FPV Receiver & USB Capture</div>
+            <div class="arrow">↓ Real-time Stream ↓</div>
+            <div class="arch-box">💻 Ground Computer Station</div>
+            <div style="background: rgba(100, 200, 255, 0.15); padding: 1.5rem; margin: 1rem 0; border-radius: 10px; border: 2px dashed #64c8ff;">
+                <div style="color: #64c8ff; font-weight: 600; margin-bottom: 1rem;">AI Processing Pipeline</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                    <div>🎬 Video Enhancement</div>
+                    <div>🎯 Object Detection</div>
+                    <div>📍 Object Tracking</div>
+                    <div>⚡ Mission Analysis</div>
+                </div>
+            </div>
+            <div class="arrow">↓ Processed Output ↓</div>
+            <div class="arch-box">📊 Operator Dashboard</div>
+            <div class="arrow">↓ Pilot Input ↓</div>
+            <div class="arch-box">🎮 Manual Drone Control</div>
+        </div>
+    </section>
+
+    <!-- AI Pipeline -->
+    <section>
+        <h2 class="section-title">AI Processing Pipeline</h2>
+        <div style="background: linear-gradient(135deg, rgba(26, 35, 50, 0.7) 0%, rgba(15, 40, 60, 0.7) 100%); padding: 2rem; border-radius: 15px; border: 1px solid rgba(100, 200, 255, 0.3);">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📹</div>
+                    <div style="color: #64c8ff; font-weight: 600;">Live Video</div>
+                    <div style="font-size: 0.9rem; color: #a8b0ba;">Capture feed</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✨</div>
+                    <div style="color: #64c8ff; font-weight: 600;">Enhancement</div>
+                    <div style="font-size: 0.9rem; color: #a8b0ba;">Improve quality</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                    <div style="color: #64c8ff; font-weight: 600;">Detection</div>
+                    <div style="font-size: 0.9rem; color: #a8b0ba;">Find objects</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+                    <div style="color: #64c8ff; font-weight: 600;">Tracking</div>
+                    <div style="font-size: 0.9rem; color: #a8b0ba;">Follow targets</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
+                    <div style="color: #64c8ff; font-weight: 600;">Analysis</div>
+                    <div style="font-size: 0.9rem; color: #a8b0ba;">Generate alerts</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                    <div style="color: #64c8ff; font-weight: 600;">Display</div>
+                    <div style="font-size: 0.9rem; color: #a8b0ba;">Show dashboard</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section>
+        <h2 class="section-title">Technology Stack</h2>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <div class="tech-icon">🐍</div>
+                <strong>Python</strong>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Core language</p>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🤖</div>
+                <strong>YOLO</strong>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Object detection</p>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">👁️</div>
+                <strong>OpenCV</strong>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Video processing</p>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🔄</div>
+                <strong>ByteTrack</strong>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Object tracking</p>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🎨</div>
+                <strong>Streamlit</strong>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Dashboard UI</p>
+            </div>
+            <div class="tech-item">
+                <div class="tech-icon">🎬</div>
+                <strong>FFmpeg</strong>
+                <p style="font-size: 0.9rem; margin-top: 0.5rem;">Video streaming</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section id="timeline">
+        <h2 class="section-title">Development Timeline</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4 style="color: #64c8ff; margin-bottom: 0.5rem;">Week 1</h4>
+                    <p>Literature Survey & Planning</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4 style="color: #ff6b9d; margin-bottom: 0.5rem;">Week 2</h4>
+                    <p>System Design & Architecture</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4 style="color: #64c8ff; margin-bottom: 0.5rem;">Weeks 3-4</h4>
+                    <p>FPV Integration & Video Capture Setup</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4 style="color: #ff6b9d; margin-bottom: 0.5rem;">Weeks 5-6</h4>
+                    <p>AI Model & Object Tracking Integration</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4 style="color: #64c8ff; margin-bottom: 0.5rem;">Week 7</h4>
+                    <p>Dashboard Development</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h4 style="color: #ff6b9d; margin-bottom: 0.5rem;">Weeks 8-9</h4>
+                    <p>Testing, Optimization & Documentation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Current Status -->
+    <section id="status">
+        <h2 class="section-title">Project Status</h2>
+        <div>
+            <h3 style="color: #4ade80; margin: 2rem 0 1rem 0;">✅ Completed</h3>
+            <div class="status-item completed">
+                <span class="status-emoji">✅</span> Working FPV drone platform
+            </div>
+            <div class="status-item completed">
+                <span class="status-emoji">✅</span> Remote controller & live FPV transmission
+            </div>
+            <div class="status-item completed">
+                <span class="status-emoji">✅</span> Ground computer available
+            </div>
+            <div class="status-item completed">
+                <span class="status-emoji">✅</span> Project concept finalized
+            </div>
+
+            <h3 style="color: #fbbf24; margin: 2rem 0 1rem 0;">🔄 In Progress</h3>
+            <div class="status-item working">
+                <span class="status-emoji">🔄</span> Capturing FPV feed on computer
+            </div>
+            <div class="status-item working">
+                <span class="status-emoji">🔄</span> Video quality improvements
+            </div>
+            <div class="status-item working">
+                <span class="status-emoji">🔄</span> YOLO object detection integration
+            </div>
+            <div class="status-item working">
+                <span class="status-emoji">🔄</span> Operator dashboard development
+            </div>
+
+            <h3 style="color: #94a3b8; margin: 2rem 0 1rem 0;">⏳ Upcoming</h3>
+            <div class="status-item pending">
+                <span class="status-emoji">⏳</span> Advanced object tracking
+            </div>
+            <div class="status-item pending">
+                <span class="status-emoji">⏳</span> Video enhancement pipeline
+            </div>
+            <div class="status-item pending">
+                <span class="status-emoji">⏳</span> AI warning system implementation
+            </div>
+            <div class="status-item pending">
+                <span class="status-emoji">⏳</span> Performance testing & optimization
+            </div>
+            <div class="status-item pending">
+                <span class="status-emoji">⏳</span> Final documentation & presentation
+            </div>
+        </div>
+    </section>
+
+    <!-- Applications -->
+    <section id="apps">
+        <h2 class="section-title">Real-World Applications</h2>
+        <div class="apps-grid">
+            <div class="app-item">
+                <div class="app-emoji">🚨</div>
+                <h4>Disaster Search & Rescue</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">💧</div>
+                <h4>Flood Monitoring</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🔥</div>
+                <h4>Fire Detection</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🌲</div>
+                <h4>Forest Surveillance</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🦁</div>
+                <h4>Wildlife Monitoring</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🛡️</div>
+                <h4>Border Security</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🚗</div>
+                <h4>Traffic Monitoring</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🌾</div>
+                <h4>Agriculture Inspection</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">⚡</div>
+                <h4>Power Line Inspection</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🏢</div>
+                <h4>Building Inspection</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">👥</div>
+                <h4>Crowd Monitoring</h4>
+            </div>
+            <div class="app-item">
+                <div class="app-emoji">🏭</div>
+                <h4>Industrial Safety</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why AURA is Different -->
+    <section>
+        <h2 class="section-title">Why AURA Stands Out</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+            <div style="background: rgba(100, 200, 255, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #64c8ff;">
+                <h3 style="color: #64c8ff; margin-bottom: 1rem;">🎯 Ground Intelligence</h3>
+                <p>Heavy AI processing happens on powerful ground stations, not on the drone. This enables using larger models without expensive onboard hardware.</p>
+            </div>
+            <div style="background: rgba(255, 107, 157, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #ff6b9d;">
+                <h3 style="color: #ff6b9d; margin-bottom: 1rem;">👤 Human-Centric</h3>
+                <p>The pilot remains in complete control at all times. AI provides assistance, recommendations, and alerts—never replaces human judgment.</p>
+            </div>
+            <div style="background: rgba(74, 222, 128, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #4ade80;">
+                <h3 style="color: #4ade80; margin-bottom: 1rem;">💰 Cost-Effective</h3>
+                <p>Reuses existing FPV drones, avoids expensive onboard AI computers, relies on open-source software. Total cost: ₹5,000-10,000.</p>
+            </div>
+            <div style="background: rgba(251, 191, 36, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #fbbf24;">
+                <h3 style="color: #fbbf24; margin-bottom: 1rem;">⚡ Performance</h3>
+                <p>Extended flight time due to reduced drone weight and power consumption. Better video enhancement improves AI accuracy.</p>
+            </div>
+            <div style="background: rgba(168, 85, 247, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #a855f7;">
+                <h3 style="color: #a855f7; margin-bottom: 1rem;">🔧 Modular Design</h3>
+                <p>Easily adapt software to different drones and robotic platforms with minimal changes. Scalable and future-proof architecture.</p>
+            </div>
+            <div style="background: rgba(236, 72, 153, 0.1); padding: 2rem; border-radius: 15px; border-left: 4px solid #ec4899;">
+                <h3 style="color: #ec4899; margin-bottom: 1rem;">📊 Real-Time Intelligence</h3>
+                <p>Live object detection, tracking, confidence scores, warnings, and system status—all on a single intuitive dashboard.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cost Breakdown -->
+    <section>
+        <h2 class="section-title">Budget Breakdown</h2>
+        <div style="max-width: 600px; margin: 0 auto;">
+            <div style="background: rgba(100, 200, 255, 0.1); padding: 2rem; border-radius: 15px; border: 1px solid rgba(100, 200, 255, 0.3);">
+                <table style="width: 100%; color: #e0e6ed;">
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2);">
+                        <td style="padding: 0.8rem; text-align: left;"><strong>Component</strong></td>
+                        <td style="padding: 0.8rem; text-align: right;"><strong>Cost (₹)</strong></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2); color: #4ade80;">
+                        <td style="padding: 0.8rem;">Hardware (Available)</td>
+                        <td style="padding: 0.8rem; text-align: right;">0</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2); color: #4ade80;">
+                        <td style="padding: 0.8rem;">Software (Open Source)</td>
+                        <td style="padding: 0.8rem; text-align: right;">0</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2);">
+                        <td style="padding: 0.8rem;">USB Capture Card</td>
+                        <td style="padding: 0.8rem; text-align: right;">800–2,000</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2);">
+                        <td style="padding: 0.8rem;">Better Camera (Optional)</td>
+                        <td style="padding: 0.8rem; text-align: right;">2,500–6,000</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2);">
+                        <td style="padding: 0.8rem;">Better Antenna (Optional)</td>
+                        <td style="padding: 0.8rem; text-align: right;">1,000–3,000</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(100, 200, 255, 0.2);">
+                        <td style="padding: 0.8rem;">Miscellaneous</td>
+                        <td style="padding: 0.8rem; text-align: right;">~1,000</td>
+                    </tr>
+                    <tr style="background: rgba(100, 200, 255, 0.2); border-radius: 0 0 15px 15px;">
+                        <td style="padding: 1rem; font-weight: 600;"><strong>Total Budget</strong></td>
+                        <td style="padding: 1rem; text-align: right; font-weight: 600; color: #64c8ff;"><strong>₹5,000–10,000</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section style="text-align: center; padding: 5rem 2rem;">
+        <h2 class="section-title" style="margin-bottom: 2rem;">Ready to Explore AURA?</h2>
+        <p style="font-size: 1.2rem; color: #a8b0ba; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+            This innovative project combines AI, robotics, and human expertise to create a smarter, more efficient drone system.
+        </p>
+        <button class="cta-button">Start Development</button>
+    </section>
+
+    <footer>
+        <p>© 2024 AURA Project | AI-Assisted Semi-Autonomous Drone with Ground Intelligence</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">Combining cutting-edge AI with practical drone technology</p>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'slideInUp 0.6s ease-out forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .tech-item, .app-item, .status-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
