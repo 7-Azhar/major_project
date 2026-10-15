@@ -1,0 +1,15 @@
+{
+  "name": "AURA user flight 640x480 - experimental OSD exclusion",
+  "reference_size": [640, 480],
+  "source": "real_fpv_user_flight.mp4",
+  "warning": "Geometric post-filter, not learned recognition. Small real objects overlapping these regions can be excluded. Horizon region covers moving OSD marks. Does not cover the post-flight STATS screen. Do not apply to other layouts without calibration.",
+  "regions": [
+    {"name": "timer", "xyxy": [250, 0, 405, 58], "max_box_size": [35, 35]},
+    {"name": "link_quality", "xyxy": [18, 52, 175, 92], "max_box_size": [35, 35]},
+    {"name": "left_telemetry", "xyxy": [18, 345, 130, 400], "max_box_size": [35, 40]},
+    {"name": "battery_left", "xyxy": [250, 345, 395, 400], "max_box_size": [40, 45]},
+    {"name": "battery_right", "xyxy": [520, 345, 640, 400], "max_box_size": [40, 45]},
+    {"name": "center_reticle", "xyxy": [295, 170, 335, 220], "max_box_size": [28, 32]},
+    {"name": "moving_horizon_marks", "xyxy": [205, 160, 420, 290], "max_box_size": [16, 20], "min_box_overlap": 0.9}
+  ]
+}

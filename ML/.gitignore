@@ -1,0 +1,7 @@
+.venv/
+.venv-portable/
+__pycache__/
+.pytest_cache/
+outputs/
+models/
+uploads/

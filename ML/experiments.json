@@ -1,0 +1,6 @@
+{
+  "1": {"name": "Model Experiment 1 - YOLOv8m VisDrone", "weights": "models/yolov8m_visdrone_recovered.pt", "training": "User Kaggle VisDrone training; no CBAM in saved checkpoint"},
+  "2": {"name": "Model Experiment 2 - YOLO11s COCO", "weights": "models/yolo11s.pt", "training": "Official COCO pretrained; no FPV fine-tuning"},
+  "3": {"name": "Model Experiment 3 - YOLO26n COCO", "weights": "models/yolo26n.pt", "training": "Official COCO pretrained; no FPV fine-tuning"},
+  "4": {"name": "Model Experiment 4 - YOLO26s COCO", "weights": "models/yolo26s.pt", "training": "Official COCO pretrained; no FPV fine-tuning"}
+}
