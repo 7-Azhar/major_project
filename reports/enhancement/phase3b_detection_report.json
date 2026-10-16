@@ -1,0 +1,462 @@
+{
+  "experiment": "AURA Phase 3B \u2014 Downstream Object Detection Evaluation",
+  "dataset": "VisDrone2019-DET validation set (real annotated UAV imagery)",
+  "dataset_note": "NOT project FPV footage. Cross-dataset class mapping applied.",
+  "num_images": 548,
+  "detector": "YOLOv8n (COCO pretrained, v8.4.51)",
+  "detector_settings": {
+    "confidence_threshold": 0.25,
+    "iou_threshold": 0.45,
+    "input_size": 640,
+    "device": "CPU (PyTorch 2.12.0+cpu)"
+  },
+  "class_mapping": {
+    "note": "Cross-dataset mapping (VisDrone\u2192COCO). Imperfect: van\u2192car, people\u2192person.",
+    "classes_evaluated": [
+      "person",
+      "bicycle",
+      "car",
+      "motorcycle",
+      "bus",
+      "truck"
+    ]
+  },
+  "pipelines": {
+    "A": {
+      "label": "Raw baseline (720p)",
+      "resolution": "1920x1080",
+      "metrics": {
+        "total_gt": 37182,
+        "total_preds": 7571,
+        "per_class": {
+          "person": {
+            "AP50": 0.071,
+            "AP50_95": 0.034,
+            "precision": 0.8027,
+            "recall": 0.0731,
+            "TP": 1021,
+            "FP": 251,
+            "FN": 12948,
+            "GT_count": 13969
+          },
+          "bicycle": {
+            "AP50": 0.0099,
+            "AP50_95": 0.0089,
+            "precision": 0.375,
+            "recall": 0.0023,
+            "TP": 3,
+            "FP": 5,
+            "FN": 1284,
+            "GT_count": 1287
+          },
+          "car": {
+            "AP50": 0.2779,
+            "AP50_95": 0.1824,
+            "precision": 0.8127,
+            "recall": 0.2927,
+            "TP": 4695,
+            "FP": 1082,
+            "FN": 11344,
+            "GT_count": 16039
+          },
+          "motorcycle": {
+            "AP50": 0.0099,
+            "AP50_95": 0.0056,
+            "precision": 0.7077,
+            "recall": 0.0094,
+            "TP": 46,
+            "FP": 19,
+            "FN": 4840,
+            "GT_count": 4886
+          },
+          "bus": {
+            "AP50": 0.095,
+            "AP50_95": 0.072,
+            "precision": 0.1991,
+            "recall": 0.1833,
+            "TP": 46,
+            "FP": 185,
+            "FN": 205,
+            "GT_count": 251
+          },
+          "truck": {
+            "AP50": 0.028,
+            "AP50_95": 0.0225,
+            "precision": 0.2156,
+            "recall": 0.0627,
+            "TP": 47,
+            "FP": 171,
+            "FN": 703,
+            "GT_count": 750
+          }
+        },
+        "confidence_distribution": {
+          "min": 0.2500031888484955,
+          "max": 0.9270969033241272,
+          "mean": 0.48895309623977873,
+          "median": 0.4618324339389801,
+          "p25": 0.33772848546504974,
+          "p75": 0.6238669753074646
+        },
+        "mAP50": 0.0819,
+        "mAP50_95": 0.0542,
+        "precision": 0.7737,
+        "recall": 0.1575,
+        "total_TP": 5858,
+        "total_FP": 1713,
+        "total_FN": 31324
+      },
+      "timing": {
+        "preprocess": {
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0
+        },
+        "enhancement": {
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0
+        },
+        "yolo": {
+          "mean": 51.15,
+          "median": 47.92,
+          "p95": 64.35
+        },
+        "total": {
+          "mean": 51.15,
+          "median": 47.92,
+          "p95": 64.35
+        },
+        "effective_fps": 20.87
+      },
+      "images_evaluated": 548
+    },
+    "B": {
+      "label": "Low-res baseline (640x360)",
+      "resolution": "640x360",
+      "metrics": {
+        "total_gt": 37182,
+        "total_preds": 7571,
+        "per_class": {
+          "person": {
+            "AP50": 0.071,
+            "AP50_95": 0.034,
+            "precision": 0.8027,
+            "recall": 0.0731,
+            "TP": 1021,
+            "FP": 251,
+            "FN": 12948,
+            "GT_count": 13969
+          },
+          "bicycle": {
+            "AP50": 0.0099,
+            "AP50_95": 0.0089,
+            "precision": 0.375,
+            "recall": 0.0023,
+            "TP": 3,
+            "FP": 5,
+            "FN": 1284,
+            "GT_count": 1287
+          },
+          "car": {
+            "AP50": 0.2779,
+            "AP50_95": 0.1824,
+            "precision": 0.8127,
+            "recall": 0.2927,
+            "TP": 4695,
+            "FP": 1082,
+            "FN": 11344,
+            "GT_count": 16039
+          },
+          "motorcycle": {
+            "AP50": 0.0099,
+            "AP50_95": 0.0056,
+            "precision": 0.7077,
+            "recall": 0.0094,
+            "TP": 46,
+            "FP": 19,
+            "FN": 4840,
+            "GT_count": 4886
+          },
+          "bus": {
+            "AP50": 0.095,
+            "AP50_95": 0.072,
+            "precision": 0.1991,
+            "recall": 0.1833,
+            "TP": 46,
+            "FP": 185,
+            "FN": 205,
+            "GT_count": 251
+          },
+          "truck": {
+            "AP50": 0.028,
+            "AP50_95": 0.0225,
+            "precision": 0.2156,
+            "recall": 0.0627,
+            "TP": 47,
+            "FP": 171,
+            "FN": 703,
+            "GT_count": 750
+          }
+        },
+        "confidence_distribution": {
+          "min": 0.2500031888484955,
+          "max": 0.9270969033241272,
+          "mean": 0.48895309623977873,
+          "median": 0.4618324339389801,
+          "p25": 0.33772848546504974,
+          "p75": 0.6238669753074646
+        },
+        "mAP50": 0.0819,
+        "mAP50_95": 0.0542,
+        "precision": 0.7737,
+        "recall": 0.1575,
+        "total_TP": 5858,
+        "total_FP": 1713,
+        "total_FN": 31324
+      },
+      "timing": {
+        "preprocess": {
+          "mean": 0.78,
+          "median": 0.77,
+          "p95": 1.09
+        },
+        "enhancement": {
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0
+        },
+        "yolo": {
+          "mean": 49.86,
+          "median": 47.66,
+          "p95": 63.53
+        },
+        "total": {
+          "mean": 50.64,
+          "median": 48.38,
+          "p95": 64.5
+        },
+        "effective_fps": 20.67
+      },
+      "images_evaluated": 548
+    },
+    "C": {
+      "label": "AURA candidate (640x360 + Zero-DCE FP16 4C)",
+      "resolution": "640x360",
+      "metrics": {
+        "total_gt": 37182,
+        "total_preds": 7013,
+        "per_class": {
+          "person": {
+            "AP50": 0.0632,
+            "AP50_95": 0.0317,
+            "precision": 0.8194,
+            "recall": 0.0659,
+            "TP": 921,
+            "FP": 203,
+            "FN": 13048,
+            "GT_count": 13969
+          },
+          "bicycle": {
+            "AP50": 0.005,
+            "AP50_95": 0.0045,
+            "precision": 0.3333,
+            "recall": 0.0023,
+            "TP": 3,
+            "FP": 6,
+            "FN": 1284,
+            "GT_count": 1287
+          },
+          "car": {
+            "AP50": 0.2596,
+            "AP50_95": 0.1738,
+            "precision": 0.8244,
+            "recall": 0.2766,
+            "TP": 4437,
+            "FP": 945,
+            "FN": 11602,
+            "GT_count": 16039
+          },
+          "motorcycle": {
+            "AP50": 0.0099,
+            "AP50_95": 0.0089,
+            "precision": 0.7368,
+            "recall": 0.0057,
+            "TP": 28,
+            "FP": 10,
+            "FN": 4858,
+            "GT_count": 4886
+          },
+          "bus": {
+            "AP50": 0.0907,
+            "AP50_95": 0.0703,
+            "precision": 0.1858,
+            "recall": 0.1873,
+            "TP": 47,
+            "FP": 206,
+            "FN": 204,
+            "GT_count": 251
+          },
+          "truck": {
+            "AP50": 0.0254,
+            "AP50_95": 0.0207,
+            "precision": 0.1981,
+            "recall": 0.0547,
+            "TP": 41,
+            "FP": 166,
+            "FN": 709,
+            "GT_count": 750
+          }
+        },
+        "confidence_distribution": {
+          "min": 0.25015589594841003,
+          "max": 0.9385776519775391,
+          "mean": 0.4813833073042912,
+          "median": 0.4521326720714569,
+          "p25": 0.3322261869907379,
+          "p75": 0.6078628301620483
+        },
+        "mAP50": 0.0756,
+        "mAP50_95": 0.0516,
+        "precision": 0.781,
+        "recall": 0.1473,
+        "total_TP": 5477,
+        "total_FP": 1536,
+        "total_FN": 31705
+      },
+      "timing": {
+        "preprocess": {
+          "mean": 0.8,
+          "median": 0.79,
+          "p95": 1.13
+        },
+        "enhancement": {
+          "mean": 40.86,
+          "median": 40.59,
+          "p95": 48.0
+        },
+        "yolo": {
+          "mean": 50.35,
+          "median": 47.86,
+          "p95": 65.64
+        },
+        "total": {
+          "mean": 92.02,
+          "median": 88.7,
+          "p95": 113.48
+        },
+        "effective_fps": 11.27
+      },
+      "images_evaluated": 548
+    },
+    "D": {
+      "label": "Quality reference (720p + Zero-DCE FP16)",
+      "resolution": "1280x720",
+      "metrics": {
+        "total_gt": 37182,
+        "total_preds": 6788,
+        "per_class": {
+          "person": {
+            "AP50": 0.063,
+            "AP50_95": 0.03,
+            "precision": 0.8142,
+            "recall": 0.064,
+            "TP": 894,
+            "FP": 204,
+            "FN": 13075,
+            "GT_count": 13969
+          },
+          "bicycle": {
+            "AP50": 0.005,
+            "AP50_95": 0.0045,
+            "precision": 0.375,
+            "recall": 0.0023,
+            "TP": 3,
+            "FP": 5,
+            "FN": 1284,
+            "GT_count": 1287
+          },
+          "car": {
+            "AP50": 0.2605,
+            "AP50_95": 0.1735,
+            "precision": 0.8408,
+            "recall": 0.2746,
+            "TP": 4404,
+            "FP": 834,
+            "FN": 11635,
+            "GT_count": 16039
+          },
+          "motorcycle": {
+            "AP50": 0.0099,
+            "AP50_95": 0.008,
+            "precision": 0.8065,
+            "recall": 0.0051,
+            "TP": 25,
+            "FP": 6,
+            "FN": 4861,
+            "GT_count": 4886
+          },
+          "bus": {
+            "AP50": 0.0899,
+            "AP50_95": 0.0702,
+            "precision": 0.1878,
+            "recall": 0.1713,
+            "TP": 43,
+            "FP": 186,
+            "FN": 208,
+            "GT_count": 251
+          },
+          "truck": {
+            "AP50": 0.0231,
+            "AP50_95": 0.02,
+            "precision": 0.1848,
+            "recall": 0.0453,
+            "TP": 34,
+            "FP": 150,
+            "FN": 716,
+            "GT_count": 750
+          }
+        },
+        "confidence_distribution": {
+          "min": 0.2500077486038208,
+          "max": 0.9375863075256348,
+          "mean": 0.4852491594021223,
+          "median": 0.45527781546115875,
+          "p25": 0.3381470888853073,
+          "p75": 0.6135676205158234
+        },
+        "mAP50": 0.0752,
+        "mAP50_95": 0.051,
+        "precision": 0.796,
+        "recall": 0.1453,
+        "total_TP": 5403,
+        "total_FP": 1385,
+        "total_FN": 31779
+      },
+      "timing": {
+        "preprocess": {
+          "mean": 2.12,
+          "median": 2.02,
+          "p95": 3.1
+        },
+        "enhancement": {
+          "mean": 163.43,
+          "median": 161.71,
+          "p95": 189.04
+        },
+        "yolo": {
+          "mean": 50.54,
+          "median": 48.27,
+          "p95": 63.01
+        },
+        "total": {
+          "mean": 216.1,
+          "median": 211.44,
+          "p95": 250.35
+        },
+        "effective_fps": 4.73
+      },
+      "images_evaluated": 548
+    }
+  }
+}

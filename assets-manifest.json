@@ -1,0 +1,45 @@
+{
+  "description": "Required model and demo assets included in the repository. Additional recordings and optional ONNX exports are bundled separately.",
+  "assets": [
+    {
+      "path": "ML/models/yolov8m_visdrone_recovered.pt",
+      "bytes": 52048245,
+      "sha256": "200f73fd846db1ceb46a55614dc90081b4ecfa1393f3f4cfd6152dd93a5928c9"
+    },
+    {
+      "path": "ML/models/yolo11s.pt",
+      "bytes": 19313732,
+      "sha256": "85a76fe86dd8afe384648546b56a7a78580c7cb7b404fc595f97969322d502d5"
+    },
+    {
+      "path": "ML/models/yolo26n.pt",
+      "bytes": 5544453,
+      "sha256": "9b09cc8bf347f0fc8a5f7657480587f25db09b34bf33b0652110fb03a8ad4fef"
+    },
+    {
+      "path": "ML/models/yolo26s.pt",
+      "bytes": 20422725,
+      "sha256": "646f8bc3fe0a656803d95c294f7852321748cb29d13466a1af8862e2db384a1b"
+    },
+    {
+      "path": "feeed enhancement/outputs/models/Epoch99.pth",
+      "bytes": 320017,
+      "sha256": "a4395acb874f320375d9704997cef874eaaaaa26a1777ceb29a92b70f74c3612"
+    },
+    {
+      "path": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+      "bytes": 51162887,
+      "sha256": "324d6a436a897d25e145df141b6cbf08198ef874d490b792682f3cdaca08428f"
+    },
+    {
+      "path": "feeed enhancement/samples/test_synthetic.mp4",
+      "bytes": 2433887,
+      "sha256": "1a1dc853cbe2426e81b27e26d61dde7a33bcb7c1dd813146f1f884ce555a13b5"
+    },
+    {
+      "path": "feeed enhancement/samples/real_fpv_degraded.mp4",
+      "bytes": 21751111,
+      "sha256": "77bdb3a73501826c0cebc3e088c61ef742a8aeb485ab4efdffa1d4b8cd9c54e5"
+    }
+  ]
+}

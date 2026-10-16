@@ -1,0 +1,434 @@
+{
+  "passed": true,
+  "combinations": [
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "identity",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 0.2,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "identity",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 0.2,
+      "detection_ms": 106.6,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "identity",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 0.2,
+      "detection_ms": 106.6,
+      "excluded_count": 2
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "identity",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 0.2,
+      "detection_ms": 106.6,
+      "excluded_count": 3
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "clahe",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 87.4,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "clahe",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 87.4,
+      "detection_ms": 23.5,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "clahe",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 87.4,
+      "detection_ms": 23.5,
+      "excluded_count": 10
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "clahe",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 87.4,
+      "detection_ms": 23.5,
+      "excluded_count": 13
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "unsharp",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 5.3,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "unsharp",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 5.3,
+      "detection_ms": 23.8,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "unsharp",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 5.3,
+      "detection_ms": 23.8,
+      "excluded_count": 9
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "unsharp",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 5.3,
+      "detection_ms": 23.8,
+      "excluded_count": 14
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "bilateral",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 3.2,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "bilateral",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 3.2,
+      "detection_ms": 24.3,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "bilateral",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 3.2,
+      "detection_ms": 24.3,
+      "excluded_count": 1
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "bilateral",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 3.2,
+      "detection_ms": 24.3,
+      "excluded_count": 4
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.4,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.4,
+      "detection_ms": 24.0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.4,
+      "detection_ms": 24.0,
+      "excluded_count": 6
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.4,
+      "detection_ms": 24.0,
+      "excluded_count": 11
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "zerodce",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 230.7,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "zerodce",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 230.7,
+      "detection_ms": 23.5,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "zerodce",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 230.7,
+      "detection_ms": 23.5,
+      "excluded_count": 2
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "zerodce",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 230.7,
+      "detection_ms": 23.5,
+      "excluded_count": 3
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_hybrid",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 23.2,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_hybrid",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 23.2,
+      "detection_ms": 23.8,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_hybrid",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 23.2,
+      "detection_ms": 23.8,
+      "excluded_count": 5
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_hybrid",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 23.2,
+      "detection_ms": 23.8,
+      "excluded_count": 7
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration_v2",
+        "detection": "off",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.7,
+      "detection_ms": 0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration_v2",
+        "detection": "original",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.7,
+      "detection_ms": 23.0,
+      "excluded_count": 0
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration_v2",
+        "detection": "exclude25",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.7,
+      "detection_ms": 23.0,
+      "excluded_count": 3
+    },
+    {
+      "config": {
+        "source": "feeed enhancement/samples/fpv/real_fpv_user_flight.mp4",
+        "enhancement": "fpv_restoration_v2",
+        "detection": "exclude50",
+        "playing": false,
+        "outlines": true,
+        "powered": true
+      },
+      "enhancement_ms": 32.7,
+      "detection_ms": 23.0,
+      "excluded_count": 6
+    }
+  ],
+  "checks": [
+    "32 enhancement/detection combinations",
+    "pause freezes frame",
+    "play advances",
+    "seek",
+    "end of recording",
+    "exclusion available on other sources",
+    "invalid controls rejected",
+    "same-frame prediction cache",
+    "idle preview returns no duplicate image",
+    "power off stops updates",
+    "power on preserves paused recording"
+  ]
+}

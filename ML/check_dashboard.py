@@ -1,5 +1,6 @@
 """Exercise the running local GPU dashboard API without a browser."""
 import json
+import argparse
 from pathlib import Path
 import time
 from urllib.request import urlopen, Request
@@ -28,6 +29,11 @@ def change(**values):
 
 
 def main():
+    global BASE
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--port', type=int, default=8765)
+    args = parser.parse_args()
+    BASE = f'http://127.0.0.1:{args.port}'
     with urlopen(BASE + '/api/options') as response:
         options = json.load(response)
     runs = []
@@ -67,10 +73,24 @@ def main():
             assert error.code == 400
     final = change(source=options['sources'][0], enhancement='identity', detection='exclude25', seek=543, playing=False)
     assert final['frame'] == 543
+    cached = change(outlines=False)
+    assert cached['inference_reused'] and cached['original'] == final['original']
+    with urlopen(BASE + f"/api/frame?after={cached['sequence']}&server_id={cached['server_id']}", timeout=5) as response:
+        assert response.status == 204 and response.read() == b''
+    off = change(powered=False)
+    assert off['status'] == 'powered off' and 'output' not in off
+    time.sleep(.2)
+    assert get()['sequence'] == off['sequence']
+    resumed = change(powered=True)
+    assert resumed['frame'] == cached['frame'] and resumed['output'] == cached['output']
+    change(outlines=True)
     output = Path(__file__).resolve().parent / 'outputs/dashboard_checks.json'
+    output.parent.mkdir(exist_ok=True)
     output.write_text(json.dumps(dict(passed=True, combinations=runs,
         checks=['32 enhancement/detection combinations', 'pause freezes frame', 'play advances', 'seek',
-                'end of recording', 'exclusion available on other sources', 'invalid controls rejected']), indent=2))
+                'end of recording', 'exclusion available on other sources', 'invalid controls rejected',
+                'same-frame prediction cache', 'idle preview returns no duplicate image',
+                'power off stops updates', 'power on preserves paused recording']), indent=2))
     print(f'All checks passed: {output}')
 
 

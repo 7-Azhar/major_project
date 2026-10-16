@@ -1,6 +1,5 @@
 """Local AURA dashboard: existing enhancement -> original VisDrone detector."""
 import argparse
-import base64
 import json
 import math
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -9,14 +8,13 @@ import sys
 import threading
 import time
 import uuid
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit, parse_qs
 from video_sources import is_camera, open_source
 
 ROOT = Path(__file__).resolve().parent
 PROJECT = ROOT.parent
 sys.path.insert(0, str(PROJECT / 'feeed enhancement'))
-from detection_modes import select_detections
-from osd_filter import OsdFilter
+from frame_processor import FrameProcessor
 
 ENHANCEMENTS = {'identity': 'Original / raw', 'clahe': 'CLAHE', 'unsharp': 'Unsharp mask',
                 'bilateral': 'Bilateral denoise', 'fpv_restoration': 'FPV restoration',
@@ -41,15 +39,17 @@ class Pipeline:
         from detect_video import VISDRONE_CLASSES
         if list(self.model.names.values()) != VISDRONE_CLASSES:
             raise ValueError('Unexpected detector class mapping')
-        self.sources = [DEFAULT_SOURCE] + sorted({str(p.relative_to(PROJECT)).replace('\\', '/')
+        self.sources = ([DEFAULT_SOURCE] if (PROJECT / DEFAULT_SOURCE).is_file() else []) + sorted({str(p.relative_to(PROJECT)).replace('\\', '/')
                         for p in PROJECT.glob('*') if p.suffix.lower() in ('.mp4', '.mov', '.avi')})
         UPLOADS.mkdir(exist_ok=True)
         self.sources += [p.relative_to(PROJECT).as_posix() for p in UPLOADS.glob('*/*') if p.suffix.lower() in VIDEO_EXTENSIONS]
         self.condition = threading.Condition()
         self.stop = False
-        self.config = dict(source=DEFAULT_SOURCE, enhancement='identity', detection='exclude25', playing=False, outlines=True, powered=True)
+        self.config = dict(source=self.sources[0] if self.sources else '', enhancement='identity', detection='exclude25', playing=False, outlines=True, powered=True)
         self.revision, self.seek = 0, 0
-        self.snapshot = dict(status='loading', error=None, config=self.config.copy(), frame=None)
+        self.server_id, self.sequence = uuid.uuid4().hex, 0
+        self.snapshot = dict(status='loading', error=None, config=self.config.copy(), frame=None,
+                             sequence=0, server_id=self.server_id, revision=-1)
         self.thread = threading.Thread(target=self.run, daemon=True)
         self.thread.start()
 
@@ -57,9 +57,9 @@ class Pipeline:
         allowed = {'source', 'enhancement', 'detection', 'playing', 'outlines', 'seek', 'powered'}
         if not isinstance(change, dict) or set(change) - allowed:
             raise ValueError('Unknown control')
-        if 'source' in change and change['source'] not in self.sources and not is_camera(change['source']):
+        if 'source' in change and change['source'] != '' and change['source'] not in self.sources and not is_camera(change['source']):
             raise ValueError('Choose a listed local recording')
-        if 'enhancement' in change and change['enhancement'] not in ENHANCEMENTS:
+        if 'enhancement' in change and (not isinstance(change['enhancement'], str) or change['enhancement'] not in ENHANCEMENTS):
             raise ValueError('Unknown enhancement')
         if 'detection' in change and change['detection'] not in ('off', 'original', 'exclude25', 'exclude50'):
             raise ValueError('Unknown detection mode')
@@ -73,7 +73,7 @@ class Pipeline:
                 raise ValueError('Live cameras cannot seek or restart. Disconnect and reconnect instead.')
             if 'seek' in change:
                 total = self.snapshot.get('total_frames', 0)
-                if total and change.get('source', self.config['source']) == self.config['source'] and change['seek'] >= total:
+                if total and change.get('source', self.config['source']) == self.snapshot.get('config', self.config)['source'] and change['seek'] >= total:
                     raise ValueError('Seek is outside this recording')
                 self.seek = change['seek']
             if 'source' in change and change['source'] != self.config['source']:
@@ -84,12 +84,30 @@ class Pipeline:
             self.condition.notify_all()
             return self.revision
 
+    def publish(self, packet, revision):
+        """Called under condition; never replace a newer control with stale work."""
+        if revision != self.revision:
+            return False
+        self.sequence += 1
+        self.snapshot = dict(packet, revision=revision, sequence=self.sequence, server_id=self.server_id)
+        self.condition.notify_all()
+        return True
+
+    def get_snapshot(self, after=None, server_id=None, timeout=0):
+        with self.condition:
+            self.condition.wait_for(lambda: self.stop or server_id != self.server_id or
+                                    after != self.sequence, timeout=timeout)
+            if server_id == self.server_id and after == self.sequence:
+                return None
+            return self.snapshot.copy()
+
     def run(self):
         from app.enhancers import get_enhancer_by_name
         self.hardware.activate()  # CUDA current device is thread-local.
-        cv2, torch = self.cv2, self.torch
-        cap, source, enhancer, enhancer_key = None, None, None, None
-        raw, enhanced, meta = None, None, {}
+        cv2 = self.cv2
+        processor = FrameProcessor(cv2, self.model, self.hardware, get_enhancer_by_name,
+                                   ROOT / 'profiles/user_flight_osd.json')
+        cap, source, raw = None, None, None
         last_revision, index = -1, -1
         try:
             while not self.stop:
@@ -97,10 +115,12 @@ class Pipeline:
                     if not self.config['powered']:
                         if is_camera(source) and cap:
                             cap.release()
-                            cap, source, raw, enhancer_key = None, None, None, None
-                        self.snapshot = dict(status='powered off', error=None, config=self.config.copy(),
-                                             frame=index, revision=self.revision, detections=[], excluded_count=0,
-                                             enhancement_ms=0, detection_ms=0)
+                            cap, source, raw = None, None, None
+                            processor.reset()
+                        if self.snapshot.get('revision') != self.revision:
+                            self.publish(dict(status='powered off', error=None, config=self.config.copy(),
+                                              frame=index, detections=[], excluded_count=0,
+                                              enhancement_ms=0, detection_ms=0), self.revision)
                         self.condition.wait(.2)
                         continue
                     if last_revision == self.revision and not self.config['playing']:
@@ -112,83 +132,60 @@ class Pipeline:
                 try:
                     changed_frame = False
                     live = is_camera(cfg['source'])
+                    if not cfg['source']:
+                        if cap:
+                            cap.release()
+                        cap, source, raw = None, None, None
+                        processor.reset()
+                        with self.condition:
+                            if revision == self.revision:
+                                self.config['playing'] = False
+                                self.publish(dict(status='idle', error=None, config=self.config.copy(), frame=None), revision)
+                        last_revision = revision
+                        continue
                     if source != cfg['source'] or (live and (cap is None or not cap.isOpened()) and cfg['playing']):
                         if cap:
                             cap.release()
-                        cap = open_source(cv2, PROJECT, cfg['source'])
+                        cap = open_source(cv2, PROJECT, cfg['source'], latest=live)
                         source = cfg['source']
                         fps = cap.get(cv2.CAP_PROP_FPS) or 25
                         if not math.isfinite(fps) or fps <= 0:
                             fps = 25
                         total = 0 if live else int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-                        raw, enhancer_key, index = None, None, -1
+                        raw, index = None, -1
+                        processor.reset()
                         seek = None if live else (0 if seek is None else seek)
                     if seek is not None:
                         if seek >= total:
                             raise ValueError('Seek is outside this recording')
                         if not cap.set(cv2.CAP_PROP_POS_FRAMES, seek):
                             raise RuntimeError('Cannot seek recording')
-                        index, raw, enhancer_key = seek - 1, None, None
+                        index, raw = seek - 1, None
+                        processor.reset()
                     if raw is None or (cfg['playing'] and revision == last_revision):
                         ok, candidate = cap.read()
                         if not ok:
                             if live:
                                 raise RuntimeError('Camera stopped delivering frames. Check the cable, then reconnect.')
+                            if raw is None or (total and index < total - 2):
+                                raise RuntimeError('Recording stopped before its reported end. Try another video codec.')
                             with self.condition:
-                                self.config['playing'] = False
-                                self.snapshot['status'] = 'ended'
-                                self.snapshot['config']['playing'] = False
+                                if revision == self.revision:
+                                    self.config['playing'] = False
+                                    self.publish(dict(self.snapshot, status='ended', config=self.config.copy()), revision)
                             last_revision = revision
                             continue
                         raw, index, changed_frame = candidate, index + 1, True
-                    changed_enhancer = enhancer_key != cfg['enhancement']
-                    if changed_enhancer:
-                        enhancer = get_enhancer_by_name(cfg['enhancement'], **({'device': 'cuda' if self.hardware.cuda else 'cpu', 'fp16': self.hardware.fp16, 'num_curves': 4}
-                                                       if cfg['enhancement'] == 'zerodce' else {}))
-                        enhancer_key = cfg['enhancement']
-                    if changed_frame or changed_enhancer:
-                        self.hardware.synchronize()
-                        tick = time.perf_counter()
-                        enhanced, meta = enhancer.process(raw.copy())
-                        self.hardware.synchronize()
-                        enhancement_ms = (time.perf_counter() - tick) * 1000
-                        if enhanced.shape != raw.shape:
-                            raise RuntimeError('Enhancer changed frame dimensions')
-                    h, w = raw.shape[:2]
-                    osd = OsdFilter(ROOT / 'profiles/user_flight_osd.json', w, h, scale_to_frame=True)
-                    detections, excluded, detection_ms = [], [], 0
-                    picture = enhanced.copy()
-                    if cfg['detection'] != 'off':
-                        self.hardware.synchronize()
-                        tick = time.perf_counter()
-                        result = self.model.predict(enhanced, imgsz=640, conf=.25, iou=.7, device=self.hardware.predict_device,
-                                                    quantize=16 if self.hardware.fp16 else 32, verbose=False, max_det=300)[0]
-                        self.hardware.synchronize()
-                        detection_ms = (time.perf_counter() - tick) * 1000
-                        raw_detections = [dict(label=self.model.names[int(c)], confidence=float(s), xyxy=b)
-                            for b, s, c in zip(result.boxes.xyxy.cpu().tolist(), result.boxes.conf.cpu().tolist(), result.boxes.cls.cpu().tolist())]
-                        mode = {'original': 0, 'exclude25': 1, 'exclude50': 2}[cfg['detection']]
-                        keep, excluded = select_detections(raw_detections, mode, osd)
-                        detections = [raw_detections[i] for i in keep]
-                        if keep:
-                            picture = result[keep].plot(line_width=1, font_size=12)
-                        if mode and cfg['outlines']:
-                            osd.draw_regions(picture)
-                    def jpeg(image):
-                        ok, data = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 85])
-                        if not ok:
-                            raise RuntimeError('Cannot encode preview')
-                        return base64.b64encode(data).decode('ascii')
+                    processed = processor.process(raw, cfg, new_frame=changed_frame)
                     packet = dict(status='playing' if cfg['playing'] else 'paused', error=None, revision=revision,
                         live=live,
-                        config=cfg, frame=index, total_frames=total, source_fps=fps, width=w, height=h,
-                        original=jpeg(raw), output=jpeg(picture), enhancement_ms=round(enhancement_ms, 1),
-                        detection_ms=round(detection_ms, 1), processing_ms=round((time.perf_counter()-started)*1000, 1),
-                        detections=detections, excluded_count=len(excluded), osd_available=True,
-                        enhancement_metadata=meta, gpu=self.hardware.name, hardware=self.hardware.report())
+                        config=cfg, frame=index, total_frames=total, source_fps=fps,
+                        processed_at=time.time(), gpu=self.hardware.name, hardware=self.hardware.report(), **processed)
+                    if live:
+                        packet['capture_frames'] = cap.delivered
+                        packet['capture_frames_skipped'] = cap.skipped
                     with self.condition:
-                        if revision == self.revision:
-                            self.snapshot = packet
+                        self.publish(packet, revision)
                     last_revision = revision
                     if live and not cfg['playing']:
                         cap.release()
@@ -201,7 +198,7 @@ class Pipeline:
                     with self.condition:
                         if revision == self.revision:
                             self.config['playing'] = False
-                            self.snapshot = dict(status='error', error=str(exc), config=self.config.copy(), frame=index, revision=revision)
+                            self.publish(dict(status='error', error=str(exc), config=self.config.copy(), frame=index), revision)
                     last_revision = revision
         finally:
             if cap:
@@ -214,8 +211,8 @@ class Pipeline:
         self.thread.join(timeout=10)
 
 
-def serve(port=8765, device='auto', precision='auto'):
-    pipeline = Pipeline(device, precision)
+def serve(port=8765, device='auto', precision='auto', open_browser=False):
+    pipeline = None
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *args):
             pass
@@ -233,16 +230,27 @@ def serve(port=8765, device='auto', precision='auto'):
                 pass
 
         def do_GET(self):
-            if self.path == '/':
+            url = urlsplit(self.path)
+            if url.path == '/':
                 self.send((ROOT / 'dashboard/index.html').read_bytes(), 'text/html; charset=utf-8')
-            elif self.path == '/sources.js':
-                self.send((ROOT / 'dashboard/sources.js').read_bytes(), 'text/javascript; charset=utf-8')
-            elif self.path == '/api/options':
-                self.send(json.dumps(dict(sources=pipeline.sources, enhancements=ENHANCEMENTS)).encode())
-            elif self.path == '/api/frame':
+            elif url.path in ('/app.js', '/style.css'):
+                mime = 'text/javascript' if url.path.endswith('.js') else 'text/css'
+                self.send((ROOT / 'dashboard' / url.path[1:]).read_bytes(), mime + '; charset=utf-8')
+            elif url.path == '/api/health':
+                self.send(json.dumps(dict(application='AURA', api_version=2, server_id=pipeline.server_id)).encode())
+            elif url.path == '/api/options':
                 with pipeline.condition:
-                    packet = pipeline.snapshot.copy()
-                self.send(json.dumps(packet).encode())
+                    sources = pipeline.sources.copy()
+                self.send(json.dumps(dict(sources=sources, enhancements=ENHANCEMENTS)).encode())
+            elif url.path == '/api/frame':
+                query = parse_qs(url.query)
+                try:
+                    after = int(query['after'][0]) if 'after' in query else None
+                except ValueError:
+                    self.send(b'{"error":"Invalid frame sequence"}', code=400)
+                    return
+                packet = pipeline.get_snapshot(after, query.get('server_id', [None])[0], timeout=2 if after is not None else 0)
+                self.send(json.dumps(packet).encode() if packet is not None else b'', code=200 if packet is not None else 204)
             else:
                 self.send(b'{}', code=404)
 
@@ -295,18 +303,42 @@ def serve(port=8765, device='auto', precision='auto'):
                 if self.path != '/api/control' or not 0 < size <= 4096 or self.headers.get('Content-Type') != 'application/json':
                     raise ValueError('Expected a small JSON control request')
                 revision = pipeline.update(json.loads(self.rfile.read(size)))
-                self.send(json.dumps(dict(revision=revision)).encode())
+                self.send(json.dumps(dict(revision=revision, server_id=pipeline.server_id)).encode())
             except (ValueError, TypeError, OSError) as exc:
                 self.send(json.dumps(dict(error=str(exc))).encode(), code=400)
     class LocalServer(ThreadingHTTPServer):
         allow_reuse_address = False
-    server = LocalServer(('127.0.0.1', port), Handler)
-    print(f'AURA dashboard ready: http://127.0.0.1:{port}', flush=True)
+        daemon_threads = True
+    url = f'http://127.0.0.1:{port}'
     try:
+        server = LocalServer(('127.0.0.1', port), Handler)
+    except OSError as exc:
+        # Check before loading models, so a second launch cannot allocate another GPU model.
+        from urllib.request import urlopen
+        try:
+            with urlopen(url + '/api/health', timeout=2) as response:
+                existing = json.load(response).get('application') == 'AURA'
+        except Exception:
+            existing = False
+        if existing and open_browser:
+            import webbrowser
+            webbrowser.open(url)
+            print(f'AURA is already running: {url}', flush=True)
+            return
+        raise RuntimeError(f'Port {port} is already in use. Open the existing AURA dashboard or choose --port with another number.') from exc
+    try:
+        pipeline = Pipeline(device, precision)
+        print(f'AURA dashboard ready: {url}', flush=True)
+        if open_browser:
+            import webbrowser
+            webbrowser.open(url)
         server.serve_forever()
+    except KeyboardInterrupt:
+        print('Stopping AURA...', flush=True)
     finally:
         server.server_close()
-        pipeline.close()
+        if pipeline is not None:
+            pipeline.close()
 
 
 if __name__ == '__main__':
@@ -314,5 +346,6 @@ if __name__ == '__main__':
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--device', default='auto', help='auto, cpu, cuda, or cuda:N')
     parser.add_argument('--precision', choices=['auto', 'fp32'], default='auto')
+    parser.add_argument('--open-browser', action='store_true', help='Open the dashboard, reusing an existing AURA server on this port')
     args = parser.parse_args()
-    serve(args.port, args.device, args.precision)
+    serve(args.port, args.device, args.precision, args.open_browser)

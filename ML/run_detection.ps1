@@ -4,12 +4,14 @@ param(
     [int]$MaxFrames = 0,
     [double]$Confidence = 0.25,
     [string]$OsdProfile = '',
-    [switch]$Show
+    [switch]$Show,
+    [ValidateSet('cuda', 'cpu')][string]$Device = 'cuda',
+    [string]$PythonPath = ''
 )
-$auraPython = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
+$auraPython = & (Join-Path $PSScriptRoot 'resolve_python.ps1') -PythonPath $PythonPath
 $auraOutput = Join-Path $PSScriptRoot ('outputs\review_' + (Get-Date -Format 'yyyyMMdd_HHmmss'))
 $auraArguments = @((Join-Path $PSScriptRoot 'detect_video.py'), '--source', $Source,
-    '--output', $auraOutput, '--imgsz', $ImageSize, '--max-frames', $MaxFrames, '--conf', $Confidence)
+    '--output', $auraOutput, '--imgsz', $ImageSize, '--max-frames', $MaxFrames, '--conf', $Confidence, '--device', $Device)
 if ($OsdProfile) { $auraArguments += @('--osd-profile', $OsdProfile) }
 if ($Show) { $auraArguments += '--show' }
 & $auraPython @auraArguments

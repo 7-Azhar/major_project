@@ -1,0 +1,236 @@
+{
+  "suite": "AURA Phase 2 Downstream AI & Quality Evaluation",
+  "timestamp": 1787511038,
+  "source": "samples/test_synthetic.mp4",
+  "benchmark_duration_per_processor_sec": 3.0,
+  "results": [
+    {
+      "baseline_label": "Baseline 0: Identity",
+      "processor": "identity",
+      "processor_class": "IdentityProcessor",
+      "observed_output_fps": 881.8,
+      "avg_frame_time_ms": 0.027,
+      "p95_frame_time_ms": 0.049,
+      "quality_metrics": {
+        "psnr_db": 999.0,
+        "ssim": 1.0,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 5364.34,
+        "sharpness_gain_pct": 0.0
+      },
+      "detection_metrics": {
+        "evaluator_name": "YoloEvaluator",
+        "processor_name": "IdentityProcessor",
+        "total_frames_evaluated": 180,
+        "precision": 1.0,
+        "recall": 1.0,
+        "map_50": 1.0,
+        "avg_confidence_raw": 0.7892,
+        "avg_confidence_enhanced": 0.7892,
+        "confidence_delta_pct": 0.0,
+        "false_positives_raw": 0,
+        "false_positives_enhanced": 0,
+        "missed_detections_raw": 0,
+        "missed_detections_enhanced": 0,
+        "notes": "Evaluated downstream object detection performance on target features."
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.0,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 1: CLAHE",
+      "processor": "clahe",
+      "processor_class": "ClaheEnhancer",
+      "observed_output_fps": 149.82,
+      "avg_frame_time_ms": 5.553,
+      "p95_frame_time_ms": 7.235,
+      "quality_metrics": {
+        "psnr_db": 34.31,
+        "ssim": 0.9704,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 4875.16,
+        "sharpness_gain_pct": -9.12
+      },
+      "detection_metrics": {
+        "evaluator_name": "YoloEvaluator",
+        "processor_name": "ClaheEnhancer",
+        "total_frames_evaluated": 180,
+        "precision": 1.0,
+        "recall": 1.0,
+        "map_50": 1.0,
+        "avg_confidence_raw": 0.7892,
+        "avg_confidence_enhanced": 0.7894,
+        "confidence_delta_pct": 0.03,
+        "false_positives_raw": 0,
+        "false_positives_enhanced": 0,
+        "missed_detections_raw": 0,
+        "missed_detections_enhanced": 0,
+        "notes": "Evaluated downstream object detection performance on target features."
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.2,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 2: Unsharp Mask",
+      "processor": "unsharp",
+      "processor_class": "UnsharpMaskEnhancer",
+      "observed_output_fps": 369.88,
+      "avg_frame_time_ms": 1.825,
+      "p95_frame_time_ms": 2.42,
+      "quality_metrics": {
+        "psnr_db": 35.08,
+        "ssim": 0.9691,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 7912.94,
+        "sharpness_gain_pct": 47.51
+      },
+      "detection_metrics": {
+        "evaluator_name": "YoloEvaluator",
+        "processor_name": "UnsharpMaskEnhancer",
+        "total_frames_evaluated": 180,
+        "precision": 1.0,
+        "recall": 1.0,
+        "map_50": 1.0,
+        "avg_confidence_raw": 0.7892,
+        "avg_confidence_enhanced": 0.7338,
+        "confidence_delta_pct": -7.02,
+        "false_positives_raw": 0,
+        "false_positives_enhanced": 0,
+        "missed_detections_raw": 0,
+        "missed_detections_enhanced": 0,
+        "notes": "Evaluated downstream object detection performance on target features."
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 75.4,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 3: Bilateral Denoise",
+      "processor": "bilateral",
+      "processor_class": "BilateralDenoiseEnhancer",
+      "observed_output_fps": 256.91,
+      "avg_frame_time_ms": 2.956,
+      "p95_frame_time_ms": 3.325,
+      "quality_metrics": {
+        "psnr_db": 43.72,
+        "ssim": 0.9814,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 5194.47,
+        "sharpness_gain_pct": -3.17
+      },
+      "detection_metrics": {
+        "evaluator_name": "YoloEvaluator",
+        "processor_name": "BilateralDenoiseEnhancer",
+        "total_frames_evaluated": 180,
+        "precision": 1.0,
+        "recall": 1.0,
+        "map_50": 1.0,
+        "avg_confidence_raw": 0.7892,
+        "avg_confidence_enhanced": 0.7906,
+        "confidence_delta_pct": 0.18,
+        "false_positives_raw": 0,
+        "false_positives_enhanced": 0,
+        "missed_detections_raw": 0,
+        "missed_detections_enhanced": 0,
+        "notes": "Evaluated downstream object detection performance on target features."
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 75.3,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 4: Composite",
+      "processor": "composite",
+      "processor_class": "CompositeEnhancer",
+      "observed_output_fps": 111.23,
+      "avg_frame_time_ms": 8.082,
+      "p95_frame_time_ms": 9.657,
+      "quality_metrics": {
+        "psnr_db": 33.24,
+        "ssim": 0.9514,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 7282.2,
+        "sharpness_gain_pct": 35.75
+      },
+      "detection_metrics": {
+        "evaluator_name": "YoloEvaluator",
+        "processor_name": "CompositeEnhancer",
+        "total_frames_evaluated": 180,
+        "precision": 1.0,
+        "recall": 1.0,
+        "map_50": 1.0,
+        "avg_confidence_raw": 0.7892,
+        "avg_confidence_enhanced": 0.7363,
+        "confidence_delta_pct": -6.71,
+        "false_positives_raw": 0,
+        "false_positives_enhanced": 0,
+        "missed_detections_raw": 0,
+        "missed_detections_enhanced": 0,
+        "notes": "Evaluated downstream object detection performance on target features."
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 75.5,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 5: Neural Zero-DCE",
+      "processor": "zerodce",
+      "processor_class": "ZeroDceEnhancer",
+      "observed_output_fps": 0.84,
+      "avg_frame_time_ms": 1180.557,
+      "p95_frame_time_ms": 1322.885,
+      "quality_metrics": {
+        "psnr_db": 38.14,
+        "ssim": 0.9982,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 5544.52,
+        "sharpness_gain_pct": 3.36
+      },
+      "detection_metrics": {
+        "evaluator_name": "YoloEvaluator",
+        "processor_name": "ZeroDceEnhancer",
+        "total_frames_evaluated": 180,
+        "precision": 1.0,
+        "recall": 1.0,
+        "map_50": 1.0,
+        "avg_confidence_raw": 0.7892,
+        "avg_confidence_enhanced": 0.7898,
+        "confidence_delta_pct": 0.07,
+        "false_positives_raw": 0,
+        "false_positives_enhanced": 0,
+        "missed_detections_raw": 0,
+        "missed_detections_enhanced": 0,
+        "notes": "Evaluated downstream object detection performance on target features."
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 83.4,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    }
+  ]
+}

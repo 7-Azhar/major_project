@@ -1,0 +1,153 @@
+{
+  "suite": "AURA Phase 1 Comparative Benchmark",
+  "timestamp": 1787509350,
+  "source": "samples/test_synthetic.mp4",
+  "benchmark_duration_per_processor_sec": 3.0,
+  "results": [
+    {
+      "baseline_label": "Baseline 0: Identity",
+      "processor": "identity",
+      "processor_class": "IdentityProcessor",
+      "resolution": "1280x720",
+      "frames_processed": 2762,
+      "frames_dropped": 0,
+      "observed_input_fps": 920.3,
+      "observed_output_fps": 920.3,
+      "avg_frame_time_ms": 0.026,
+      "median_frame_time_ms": 0.022,
+      "p95_frame_time_ms": 0.05,
+      "min_frame_time_ms": 0.011,
+      "max_frame_time_ms": 0.136,
+      "quality_metrics": {
+        "psnr_db": 999.0,
+        "ssim": 1.0,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 5364.34,
+        "sharpness_gain_pct": 0.0
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.5,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 1: CLAHE",
+      "processor": "clahe",
+      "processor_class": "ClaheEnhancer",
+      "resolution": "1280x720",
+      "frames_processed": 453,
+      "frames_dropped": 1242,
+      "observed_input_fps": 564.7,
+      "observed_output_fps": 150.74,
+      "avg_frame_time_ms": 5.616,
+      "median_frame_time_ms": 5.026,
+      "p95_frame_time_ms": 7.428,
+      "min_frame_time_ms": 4.1,
+      "max_frame_time_ms": 106.207,
+      "quality_metrics": {
+        "psnr_db": 34.31,
+        "ssim": 0.9704,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 4875.16,
+        "sharpness_gain_pct": -9.12
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.9,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 2: Unsharp Mask",
+      "processor": "unsharp",
+      "processor_class": "UnsharpMaskEnhancer",
+      "resolution": "1280x720",
+      "frames_processed": 1190,
+      "frames_dropped": 706,
+      "observed_input_fps": 632.27,
+      "observed_output_fps": 396.42,
+      "avg_frame_time_ms": 1.742,
+      "median_frame_time_ms": 1.7,
+      "p95_frame_time_ms": 2.135,
+      "min_frame_time_ms": 1.271,
+      "max_frame_time_ms": 3.165,
+      "quality_metrics": {
+        "psnr_db": 35.08,
+        "ssim": 0.9691,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 7912.94,
+        "sharpness_gain_pct": 47.51
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.8,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 3: Bilateral Denoise",
+      "processor": "bilateral",
+      "processor_class": "BilateralDenoiseEnhancer",
+      "resolution": "1280x720",
+      "frames_processed": 741,
+      "frames_dropped": 1114,
+      "observed_input_fps": 618.9,
+      "observed_output_fps": 246.96,
+      "avg_frame_time_ms": 3.105,
+      "median_frame_time_ms": 2.967,
+      "p95_frame_time_ms": 4.005,
+      "min_frame_time_ms": 2.508,
+      "max_frame_time_ms": 5.142,
+      "quality_metrics": {
+        "psnr_db": 43.72,
+        "ssim": 0.9814,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 5194.47,
+        "sharpness_gain_pct": -3.17
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.8,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    },
+    {
+      "baseline_label": "Baseline 4: Composite",
+      "processor": "composite",
+      "processor_class": "CompositeEnhancer",
+      "resolution": "1280x720",
+      "frames_processed": 336,
+      "frames_dropped": 1447,
+      "observed_input_fps": 593.39,
+      "observed_output_fps": 111.7,
+      "avg_frame_time_ms": 8.099,
+      "median_frame_time_ms": 8.012,
+      "p95_frame_time_ms": 9.272,
+      "min_frame_time_ms": 6.783,
+      "max_frame_time_ms": 11.714,
+      "quality_metrics": {
+        "psnr_db": 33.24,
+        "ssim": 0.9514,
+        "raw_tenengrad": 5364.34,
+        "enhanced_tenengrad": 7282.2,
+        "sharpness_gain_pct": 35.75
+      },
+      "hardware": {
+        "cpu_utilization_pct": 0.0,
+        "ram_utilization_pct": 73.9,
+        "gpu_utilization_pct": "N/A",
+        "gpu_memory_used_mb": "N/A",
+        "gpu_name": "N/A"
+      }
+    }
+  ]
+}

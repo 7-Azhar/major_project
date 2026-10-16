@@ -1,10 +1,12 @@
 # AURA detector milestone — 15 October 2026
 
+**Current dashboard guide (16 October):** [DASHBOARD_GUIDE.md](DASHBOARD_GUIDE.md). Double-click `Start AURA.cmd` in the project root to open the dashboard on port 8766. The update adds same-frame prediction caching, automatic browser reconnection, latest-frame camera buffering, a downloadable review snapshot, and a responsive monitor-first layout. The original model, enhancement algorithms, and local Python environment are preserved. The sections below retain the milestone history.
+
 ## Main web dashboard: enhancement followed by detection
 
 ### Hardware portability
 
-The dashboard detects the available CUDA device instead of depending on an RTX model name. Defaults remain GPU 0 with FP16 on this RTX 2050. `run_dashboard.ps1` accepts `-Device auto|cpu|cuda|cuda:N`, `-Precision auto|fp32`, and `-PythonPath` for a destination machine's environment. Auto falls back to clearly labelled CPU processing when CUDA is unavailable; explicit CUDA requests fail rather than silently switching. See [PORTABLE_SETUP.md](PORTABLE_SETUP.md) for required weights, a fresh environment and the official PyTorch installation selector. Do not copy this laptop's `.venv`, which references machine-specific paths. Existing packages and the running dashboard were left intact; updated hardware selection takes effect on the next launch.
+The dashboard detects the available CUDA device instead of depending on an RTX model name. Defaults remain GPU 0 with FP16 on this RTX 2050. `run_dashboard.ps1` accepts `-Device auto|cpu|cuda|cuda:N`, `-Precision auto|fp32`, and `-PythonPath` for a destination machine's environment. Auto falls back to clearly labelled CPU processing when CUDA is unavailable; explicit CUDA requests fail rather than silently switching. See [PORTABLE_SETUP.md](PORTABLE_SETUP.md) for required weights, a fresh environment and the official PyTorch installation selector. Do not copy this laptop's `.venv`, which references machine-specific paths. Existing packages are unchanged.
 
 ### Start the page and use power
 
@@ -30,11 +32,11 @@ Open **http://127.0.0.1:8765** and keep the launcher running. Ctrl+C stops the s
 
 The webpage controls the existing eight enhancement methods, detection off/original/exclude 0.25/exclude 0.50, optional exclusion outlines, side-by-side original input, play/pause, seeking, restart and selection of recordings in the project root. It starts paused with raw enhancement and Exclude 0.25 detection. The source pixels pass through the chosen existing enhancer before the baseline detector receives them. Exclusion operates on predictions afterward. Changing settings while paused reprocesses that frame; settings do not require an OpenCV video window.
 
-Zero-DCE uses the existing pretrained PyTorch FP16 implementation with four curves, explicitly on CUDA; this avoids the older viewer's working-directory-dependent ONNX selection. The seven other choices reuse the existing classes directly. Temporal restoration state resets on seek, source changes and enhancement changes; display-only changes reuse the enhanced frame. Errors are surfaced rather than silently substituting raw enhancement.
+Zero-DCE uses the existing pretrained PyTorch implementation with four curves, using the selected hardware and precision; this avoids the older viewer's working-directory-dependent ONNX selection. The seven other choices reuse the existing classes directly. Temporal restoration state resets on seek, source changes and enhancement changes; display-only changes reuse the enhanced frame and its predictions. Errors are surfaced rather than silently substituting raw enhancement.
 
 The dashboard offers telemetry exclusion for every input and scales the existing FPV regions to its dimensions. Original disables all exclusion filtering while keeping detections; Detection off bypasses detection entirely. The selected mode persists across source changes. Frames stay local. One shared backend session serves every open browser tab; changes in one tab affect the others. Browser previews poll at approximately 10 Hz and may skip intermediate processed frames; processing slows playback if it cannot keep up. Timings are per-frame processing observations, including cold-start costs, not camera-to-screen latency or sustained benchmarks.
 
-The service binds only to 127.0.0.1. The older batch exporter and experiments remain available separately. Recording/export from the webpage, authentication for remote access, and flight control are not implemented.
+The service binds only to 127.0.0.1. The older batch exporter and experiments remain available separately. The webpage can save a review snapshot; video recording/export, authentication for remote access, and flight control are not implemented.
 
 ### Input selection update
 

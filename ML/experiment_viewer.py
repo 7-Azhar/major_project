@@ -20,15 +20,18 @@ def main():
     parser.add_argument('--mode', type=int, choices=[1, 2, 3], default=1)
     parser.add_argument('--title', default='Model Experiment 1 - YOLOv8m VisDrone')
     parser.add_argument('--headless-frames', type=int, default=0, help='Smoke check: cycle all modes without opening a window')
+    parser.add_argument('--device', default='auto', help='auto, cpu, cuda, or cuda:N')
+    parser.add_argument('--precision', choices=['auto', 'fp32'], default='auto')
     args = parser.parse_args()
     import cv2
     import torch
     from ultralytics import YOLO
     if not args.weights.is_file() or not args.source.is_file():
         parser.error('Existing weights and source recording are required')
-    if not torch.cuda.is_available():
-        raise RuntimeError('CUDA unavailable; this experiment requires the GPU environment')
-    model = YOLO(str(args.weights)).to(0)
+    from hardware import Hardware
+    hardware = Hardware(torch, args.device, args.precision)
+    print(json.dumps(hardware.report()), flush=True)
+    model = YOLO(str(args.weights)).to(hardware.device)
     cap = cv2.VideoCapture(str(args.source))
     ok, frame = cap.read()
     if not ok:
@@ -39,7 +42,8 @@ def main():
     if fps <= 0:
         raise ValueError('Invalid recording frame rate')
     osd = OsdFilter(args.profile, width, height)
-    options = dict(imgsz=640, conf=.25, iou=.7, device=0, quantize=16, verbose=False, max_det=300)
+    options = dict(imgsz=640, conf=.25, iou=.7, device=hardware.predict_device,
+                   quantize=16 if hardware.fp16 else 32, verbose=False, max_det=300)
     for _ in range(5):
         model.predict(frame, **options)
     output = ROOT / 'outputs' / ('interactive_' + datetime.now().strftime('%Y%m%d_%H%M%S_%f'))
@@ -48,7 +52,7 @@ def main():
         title=args.title, weights=str(args.weights.resolve()),
         weights_sha256=hashlib.sha256(args.weights.read_bytes()).hexdigest(),
         source=str(args.source.resolve()), profile=osd.profile, classes=model.names,
-        inference=options, modes=MODES,
+        inference=options, hardware=hardware.report(), modes=MODES,
         note='Recording preview; switching affects display only. Exclusions can hide real targets.'
     ), indent=2), encoding='utf-8')
     state = dict(mode=args.mode - 1, paused=False)
@@ -64,10 +68,10 @@ def main():
         with (output / 'events.jsonl').open('w', encoding='utf-8') as log:
             while ok:
                 began = time.perf_counter()
-                torch.cuda.synchronize()
+                hardware.synchronize()
                 started = time.perf_counter()
                 result = model.predict(frame, **options)[0]
-                torch.cuda.synchronize()
+                hardware.synchronize()
                 latency = (time.perf_counter() - started) * 1000
                 raw = [dict(class_id=int(c), label=model.names[int(c)], confidence=float(s), xyxy=b)
                        for b, s, c in zip(result.boxes.xyxy.cpu().tolist(), result.boxes.conf.cpu().tolist(), result.boxes.cls.cpu().tolist())]

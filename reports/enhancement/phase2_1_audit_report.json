@@ -1,0 +1,96 @@
+{
+  "phase": "Phase 2.1 — Experimental Audit & Validation",
+  "timestamp": 1787511315,
+  "audit_summary": {
+    "yolo_evaluator_status": "Evaluation Scaffold / Interface Contract (NOT a real trained YOLO neural network experiment yet)",
+    "synthetic_dataset_status": "Synthetic Benchmark (samples/test_synthetic.mp4 - vector grid & shapes)",
+    "real_fpv_dataset_status": "Real FPV Degradation Benchmark (samples/real_fpv_degraded.mp4 - 35% low-light, vignetting, Gaussian noise sigma=18, motion blur)",
+    "memory_leak_audit": "PASSED (Continuous 60s benchmark processed 14,710 frames with 0% RSS memory growth and 67.1% RAM usage)",
+    "zero_dce_cpu_status": "Prototype Neural Enhancer with unacceptable CPU latency (~1.2-2.0 s/frame) for live FPV at 720p without GPU acceleration"
+  },
+  "latency_definitions": {
+    "processing_latency_ms": "Time spent strictly executing processor.process(frame)",
+    "end_to_end_latency_ms": "Time from frame queue fetch + processing + HUD display render + video recorder write",
+    "throughput_fps": "Total output frames processed per second under bounded buffer queue drops",
+    "fps_latency_discrepancy_explanation": "FPS != 1000 / processing_latency because pipeline throughput includes VideoCapture thread I/O, queue lock contention, and OS thread context switching"
+  },
+  "degraded_fpv_benchmark_results": [
+    {
+      "method": "Identity (Baseline 0)",
+      "output_fps": 733.7,
+      "processor_latency_ms": 0.035,
+      "p95_latency_ms": 0.058,
+      "psnr_db": "INF",
+      "ssim": 1.0,
+      "tenengrad_gain_pct": 0.0,
+      "artifacts": "None",
+      "suitable_for_live_fpv": true
+    },
+    {
+      "method": "CLAHE (Baseline 1)",
+      "output_fps": 127.5,
+      "processor_latency_ms": 6.37,
+      "p95_latency_ms": 8.114,
+      "psnr_db": 26.58,
+      "ssim": 0.6109,
+      "tenengrad_gain_pct": 11.9,
+      "artifacts": "Noise amplification in pitch-dark background regions",
+      "suitable_for_live_fpv": true
+    },
+    {
+      "method": "Unsharp Mask (Baseline 2)",
+      "output_fps": 344.2,
+      "processor_latency_ms": 1.867,
+      "p95_latency_ms": 2.479,
+      "psnr_db": 34.98,
+      "ssim": 0.9485,
+      "tenengrad_gain_pct": 94.6,
+      "artifacts": "High-contrast edge halos if amount > 1.5",
+      "suitable_for_live_fpv": true
+    },
+    {
+      "method": "Bilateral Denoise (Baseline 3)",
+      "output_fps": 192.5,
+      "processor_latency_ms": 3.807,
+      "p95_latency_ms": 4.839,
+      "psnr_db": 43.01,
+      "ssim": 0.9593,
+      "tenengrad_gain_pct": -4.8,
+      "artifacts": "Slight texture smoothing in fine background foliage",
+      "suitable_for_live_fpv": true
+    },
+    {
+      "method": "Composite Classical (Baseline 4)",
+      "output_fps": 95.0,
+      "processor_latency_ms": 9.329,
+      "p95_latency_ms": 11.313,
+      "psnr_db": 27.25,
+      "ssim": 0.6321,
+      "tenengrad_gain_pct": 83.8,
+      "artifacts": "Combined edge halos and noise stretch if unconstrained",
+      "suitable_for_live_fpv": true
+    },
+    {
+      "method": "Zero-DCE CPU (Baseline 5)",
+      "output_fps": 0.5,
+      "processor_latency_ms": 2049.88,
+      "p95_latency_ms": 2475.07,
+      "psnr_db": 44.15,
+      "ssim": 0.9997,
+      "tenengrad_gain_pct": -2.4,
+      "artifacts": "Unacceptable CPU execution latency (~2 s/frame)",
+      "suitable_for_live_fpv": false
+    }
+  ],
+  "engineering_answers": {
+    "A_fastest_method": "Identity (0.035 ms) / Unsharp Mask (1.867 ms)",
+    "B_best_visual_improvement": "Composite (Denoise -> CLAHE -> Sharpen) for multi-degradation FPV",
+    "C_best_tradeoff": "Bilateral Denoise (3.807 ms) + CLAHE (6.370 ms)",
+    "D_fewest_artifacts": "Bilateral Denoise (smooths noise without edge halos)",
+    "E_safest_for_downstream_cv": "Bilateral Denoise (reduces false positive noise spikes without hallucinating false edges)",
+    "F_is_yolo_experiment_valid": "False - Current YOLO module is a scaffold/interface contract using contour heuristics, NOT a real trained YOLO deep neural network",
+    "G_is_gpu_acceleration_justified": "True - Zero-DCE on CPU takes ~2049 ms/frame; GPU FP16/ONNX acceleration is required to achieve <10 ms latency",
+    "H_actual_bottleneck": "Un-accelerated CPU PyTorch forward tensor conversions and multi-stage classical CPU loops at 720p resolution",
+    "I_phase3_objective": "Implement ONNX Runtime / TensorRT GPU acceleration for Zero-DCE neural models & integrate a real trained ONNX YOLOv8 object detector"
+  }
+}

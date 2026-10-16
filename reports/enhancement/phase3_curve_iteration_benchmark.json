@@ -1,0 +1,86 @@
+[
+  {
+    "config": "Zero-DCE FP32 (8 Curves, 720p)",
+    "precision": "FP32",
+    "curves": 8,
+    "resolution": "1280x720",
+    "gpu_infer_ms": 137.17679999535903,
+    "total_ms": 153.53869999671588,
+    "fps": 6.504653738280779,
+    "max_abs_diff": 0.0,
+    "mean_abs_diff": 0.0,
+    "tenengrad": 53641.00143012153
+  },
+  {
+    "config": "Zero-DCE FP16 (8 Curves, 720p)",
+    "precision": "FP16",
+    "curves": 8,
+    "resolution": "1280x720",
+    "gpu_infer_ms": 74.2093999942881,
+    "total_ms": 115.84745000436669,
+    "fps": 8.73215219048827,
+    "max_abs_diff": 1.0,
+    "mean_abs_diff": 0.05620876736111111,
+    "tenengrad": 53641.51400390625
+  },
+  {
+    "config": "Zero-DCE FP16 (6 Curves, 720p)",
+    "precision": "FP16",
+    "curves": 6,
+    "resolution": "1280x720",
+    "gpu_infer_ms": 70.48930000019027,
+    "total_ms": 104.99549999804003,
+    "fps": 9.516503568069856,
+    "max_abs_diff": 19.0,
+    "mean_abs_diff": 8.838534071180556,
+    "tenengrad": 55818.35925564236
+  },
+  {
+    "config": "Zero-DCE FP16 (4 Curves, 720p)",
+    "precision": "FP16",
+    "curves": 4,
+    "resolution": "1280x720",
+    "gpu_infer_ms": 68.85454999428475,
+    "total_ms": 109.95025000738679,
+    "fps": 9.172659585525924,
+    "max_abs_diff": 37.0,
+    "mean_abs_diff": 18.148907335069445,
+    "tenengrad": 57423.574038628474
+  },
+  {
+    "config": "Zero-DCE FP16 (2 Curves, 720p)",
+    "precision": "FP16",
+    "curves": 2,
+    "resolution": "1280x720",
+    "gpu_infer_ms": 67.00090000231285,
+    "total_ms": 103.71105000376701,
+    "fps": 9.603310760355964,
+    "max_abs_diff": 56.0,
+    "mean_abs_diff": 27.917826244212964,
+    "tenengrad": 58396.3589453125
+  },
+  {
+    "config": "Zero-DCE FP16 (4 Curves, 960x540)",
+    "precision": "FP16",
+    "curves": 4,
+    "resolution": "960x540",
+    "gpu_infer_ms": 38.645200002065394,
+    "total_ms": 58.07479999930365,
+    "fps": 16.668673853176017,
+    "max_abs_diff": 206.0,
+    "mean_abs_diff": 47.526818938078705,
+    "tenengrad": 17971.079568142362
+  },
+  {
+    "config": "Zero-DCE FP16 (4 Curves, 640x360)",
+    "precision": "FP16",
+    "curves": 4,
+    "resolution": "640x360",
+    "gpu_infer_ms": 17.472550003731158,
+    "total_ms": 27.36680000089109,
+    "fps": 35.45489516905644,
+    "max_abs_diff": 204.0,
+    "mean_abs_diff": 56.03637478298611,
+    "tenengrad": 8044.241707899306
+  }
+]

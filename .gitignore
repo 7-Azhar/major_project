@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv*/
+.env
+.env.*
+!.env.example
+*.log
+.local-backups/
+handoff-check/
+# Local datasets and generated results are recreated by the supplied tools.
+feeed enhancement/data/
+feeed enhancement/logs/
+feeed enhancement/.venv_libs/
+ML/uploads/
+# A local scratch note, not a launcher.
+/# Launch with default auto-detected.txt
