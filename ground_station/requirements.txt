@@ -1,0 +1,9 @@
+# Separate lightweight service environment: never replaces AURA's Torch/CUDA.
+fastapi==0.143.0
+uvicorn==0.54.0
+opencv-python==4.13.0.92
+numpy==2.2.6
+pymavlink==2.4.50
+pyserial==3.5
+httpx==0.28.1
+pytest==9.1.1

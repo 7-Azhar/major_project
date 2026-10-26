@@ -6,10 +6,20 @@ let lastRecording = '', seeking = false;
 const modes = [...document.querySelectorAll('[data-mode]')];
 const clock = n => Math.floor(n / 60) + ':' + String(Math.floor(n % 60)).padStart(2, '0');
 
+async function stationHeaders() {
+  if (!document.body.dataset.stationToken) return {};
+  // The embedded page may outlive a ground-station process restart.
+  const response = await fetch('../api/session', {signal: AbortSignal.timeout(8000)});
+  if (!response.ok) throw Error('Ground station session unavailable');
+  const session = await response.json();
+  return {'X-Station-Token': session.token};
+}
+
 async function jsonRequest(url, init = {}) {
+  if (init.method === 'POST') init.headers = {...init.headers, ...await stationHeaders()};
   const response = await fetch(url, {...init, signal: AbortSignal.timeout(8000)});
   const result = await response.json();
-  if (!response.ok) throw Error(result.error || 'AURA could not complete the request.');
+  if (!response.ok) throw Error(result.error || (typeof result.detail === 'string' ? result.detail : '') || 'AURA could not complete the request.');
   return result;
 }
 function refreshAvailability() {
@@ -32,7 +42,7 @@ function control(change) {
   refreshAvailability();
   $('status').textContent = 'Applying…';
   const task = controlQueue.then(async () => {
-    const result = await jsonRequest('/api/control', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(change)});
+    const result = await jsonRequest('api/control', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(change)});
     if (result.server_id && serverId !== result.server_id) {
       serverId = result.server_id;
       sequence = -1;
@@ -54,7 +64,7 @@ function setSelected(id, value) {
   if (document.activeElement !== $(id)) $(id).value = value;
 }
 async function loadOptions() {
-  options = await jsonRequest('/api/options');
+  options = await jsonRequest('api/options');
   $('source').replaceChildren(new Option('Choose an input…', ''), ...options.sources.map(source => new Option(source.split('/').pop(), source)));
   $('enhancement').replaceChildren(...Object.entries(options.enhancements).map(([key, label]) => new Option(label, key)));
   if (!options.sources.includes(lastRecording)) lastRecording = options.sources[0] || '';
@@ -81,8 +91,8 @@ function render(s) {
     $('time').textContent = '— / —';
     $('device').textContent = 'Local processing';
   }
-  if (live && ![...$('source').options].some(option => option.value === s.config.source)) {
-    $('source').add(new Option('Live ' + s.config.source, s.config.source));
+  if (s.config.source && ![...$('source').options].some(option => option.value === s.config.source)) {
+    $('source').add(new Option(live ? 'Live ' + s.config.source : s.config.source.split('/').pop(), s.config.source));
   }
   if (!live && s.config.source) lastRecording = s.config.source;
   setSelected('source', s.config.source);
@@ -116,7 +126,7 @@ function render(s) {
 async function poll() {
   try {
     const query = serverId ? '?after=' + sequence + '&server_id=' + encodeURIComponent(serverId) : '';
-    const response = await fetch('/api/frame' + query, {signal: AbortSignal.timeout(8000)});
+    const response = await fetch('api/frame' + query, {signal: AbortSignal.timeout(8000)});
     if (!response.ok) throw Error('Pipeline unavailable');
     const reconnected = !online;
     online = true;
@@ -182,15 +192,19 @@ for (let index = 0; index < 10; index++) $('cameraIndex').add(new Option('Camera
 $('connectCamera').onclick = () => change({source: 'camera:' + $('cameraIndex').value, playing: true});
 $('disconnectCamera').onclick = () => change({source: lastRecording || '', playing: false});
 $('cancelUpload').onclick = () => upload?.abort();
-$('videoFile').onchange = () => {
+$('videoFile').onchange = async () => {
   const file = $('videoFile').files[0];
   if (!file) return;
   if (file.size === 0 || file.size > 1024 ** 3) { $('uploadStatus').textContent = 'Choose a nonempty video up to 1 GB.'; $('videoFile').value = ''; return; }
+  let auth;
+  try { auth = await stationHeaders(); }
+  catch (error) { $('uploadStatus').textContent = error.message; $('videoFile').value = ''; return; }
   const request = upload = new XMLHttpRequest();
   refreshAvailability();
   $('cancelUpload').classList.remove('hidden');
   $('uploadStatus').textContent = 'Copying locally…';
-  request.open('POST', '/api/upload');
+  request.open('POST', 'api/upload');
+  for (const [name, value] of Object.entries(auth)) request.setRequestHeader(name, value);
   request.timeout = 5 * 60 * 1000;
   request.setRequestHeader('Content-Type', 'application/octet-stream');
   request.setRequestHeader('X-Filename', encodeURIComponent(file.name));

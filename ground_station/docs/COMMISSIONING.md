@@ -1,0 +1,24 @@
+# Commissioning from demo to physical integration
+
+The application defaults to simulation. Physical movement is a separate acceptance stage; no hardware flight test has been conducted.
+
+1. Run demo and tests. Verify directional movement, automatic expiry, incident snapshots, exports and route preview. Synthetic video is not an AI accuracy benchmark.
+2. Identify your receiver model/version, Backpack capability, GPS/compass model, goggles/receiver AV output and capture connector. Confirm board revision and preserve original configuration before any firmware change.
+3. Establish ArduCopter with Mission Planner independently: sensor calibration, board orientation, motor order/direction, ESC protocol, receiver channels, flight modes, battery calibration, GPS/EKF and tested RC/GCS/battery failsafes. Remove propellers for bench work. A laptop does not replace FC safety configuration.
+4. Prove video capture alone. Run `scripts/devices.py`, choose the correct index and native PAL/NTSC dimensions. Test signal loss and device disconnect; no synthetic fallback is used in live mode. Compare a real timer/LED through direct viewing and browser capture to measure end-to-end delay.
+5. Configure compatible ELRS MAVLink/Backpack forwarding from the official guide. Confirm telemetry in Mission Planner first, then close it before running this app on the same endpoint. Confirm both TX and RX UART wires. Watch battery, satellite fix and GPS position change physically; make sure these are actual telemetry rather than demo values.
+6. Copy `config.example.json` to `config.json`. Set `mode=live`, a real `video_source`, correct MAVLink transport and target system/component IDs. **Keep `live_control=false` and `live_missions=false`.** Set configured home coordinates to your test origin; default coordinates are only a simulation example. Check that missing heartbeat/position/GPS/battery/EKF each blocks commands.
+7. Use ArduPilot SITL or a dedicated bench rig to validate message delivery and movement axes before enabling a physical aircraft. The automated mock verifies packet frame/mask but does not prove FC behaviour. Because Guided body-frame velocity requires a healthy position estimate, a stationary bench aircraft will intentionally fail the minimum-altitude control gate; do not bypass that gate to spin motors.
+8. Only after supervised commissioning, enable `live_control` in config. Enable `live_missions` separately only after the GPS navigator has been validated in SITL and the controlled operating environment. This application never arms the drone, selects GUIDED, or takes off. The pilot selects the appropriate mode after establishing a safe hover. The GUI movement lease must refresh every second and expires after 3 seconds. Manual requests expire after at most 1 second; a reviewed mission streams bounded GPS-feedback velocity while the lease remains valid. Suggested initial speed is 0.5 m/s. Mission pauses remain latched until explicit resume.
+9. Test manual takeover by changing flight mode on the handset. The app clears its lease on a non-GUIDED heartbeat and stops issuing movement. A release button cancels laptop setpoints; it is **not** an emergency motor kill. Set and verify the FC Guided velocity timeout and GCS/RC failsafes separately. Loss of the app or radio link must be handled onboard.
+10. Validate real detection/OSD performance across lighting, blur, altitude and analog signal breakup. Rescue leads need human review. Validate an appropriate custom YOLO model if the baseline HOG detector performs poorly.
+
+## Acceptance record to collect
+
+Record hardware/firmware versions, actual telemetry rates, video end-to-end latency, command-to-response delay, battery calibration, GNSS/heading readiness, setpoint timeout, pilot takeover behaviour and RF/video loss outcomes. Only a measured test result supports a claim that the physical project works.
+
+## Control limitations
+
+The application checks per-message ages (2.5 seconds for heartbeat, position, GPS, battery and EKF), video age (1 second), GUIDED, armed state, 3D fix, position-estimator flags, battery threshold, altitude 1 m to configured maximum, and distance from configured home. These are application gates, not a certified geofence. Configure onboard fences and failsafes for radio/computer loss and inertia. Velocity messages have no COMMAND_ACK; the GUI labels them requested rather than executed. Navigation feedback and FC logs must demonstrate response.
+
+The software transmits a zero-velocity request when an active command expires if heartbeat remains fresh and GUIDED. When the pilot leaves GUIDED, it sends no further velocity request. Transport failure cancels the control lease. Other aircraft system/component IDs cannot update the selected aircraft state. Incoming UDP is not authenticated; avoid shared/untrusted networks.

@@ -109,6 +109,7 @@ class Pipeline:
                                    ROOT / 'profiles/user_flight_osd.json')
         cap, source, raw = None, None, None
         last_revision, index = -1, -1
+        source_epoch, captured_at = uuid.uuid4().hex, None
         try:
             while not self.stop:
                 with self.condition:
@@ -144,6 +145,7 @@ class Pipeline:
                         last_revision = revision
                         continue
                     if source != cfg['source'] or (live and (cap is None or not cap.isOpened()) and cfg['playing']):
+                        source_epoch, captured_at = uuid.uuid4().hex, None
                         if cap:
                             cap.release()
                         cap = open_source(cv2, PROJECT, cfg['source'], latest=live)
@@ -156,6 +158,7 @@ class Pipeline:
                         processor.reset()
                         seek = None if live else (0 if seek is None else seek)
                     if seek is not None:
+                        source_epoch = uuid.uuid4().hex
                         if seek >= total:
                             raise ValueError('Seek is outside this recording')
                         if not cap.set(cv2.CAP_PROP_POS_FRAMES, seek):
@@ -163,6 +166,7 @@ class Pipeline:
                         index, raw = seek - 1, None
                         processor.reset()
                     if raw is None or (cfg['playing'] and revision == last_revision):
+                        read_started = time.time()
                         ok, candidate = cap.read()
                         if not ok:
                             if live:
@@ -176,9 +180,11 @@ class Pipeline:
                             last_revision = revision
                             continue
                         raw, index, changed_frame = candidate, index + 1, True
+                        captured_at = (cap.delivered_at or read_started) if live else read_started
                     processed = processor.process(raw, cfg, new_frame=changed_frame)
                     packet = dict(status='playing' if cfg['playing'] else 'paused', error=None, revision=revision,
                         live=live,
+                        captured_at=captured_at, source_epoch=source_epoch,
                         config=cfg, frame=index, total_frames=total, source_fps=fps,
                         processed_at=time.time(), gpu=self.hardware.name, hardware=self.hardware.report(), **processed)
                     if live:
@@ -226,7 +232,7 @@ def serve(port=8765, device='auto', precision='auto', open_browser=False):
             self.end_headers()
             try:
                 self.wfile.write(data)
-            except (BrokenPipeError, ConnectionResetError):
+            except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
                 pass
 
         def do_GET(self):

@@ -2,7 +2,7 @@ from pathlib import Path
 import threading
 from unittest.mock import Mock
 import pytest
-from video_sources import is_camera, open_source
+from video_sources import LatestFrameCapture, is_camera, open_source
 from dashboard import Pipeline, DEFAULT_SOURCE
 
 
@@ -40,3 +40,15 @@ def test_live_camera_rejects_seek_and_preserves_selected_filter():
     assert pipeline.config['detection'] == 'exclude25'
     with pytest.raises(ValueError, match='cannot seek'):
         pipeline.update(dict(seek=0))
+
+
+def test_buffered_camera_frame_keeps_capture_time(monkeypatch):
+    capture = Mock()
+    capture.read.side_effect = [(True, 'frame'), (False, None)]
+    monkeypatch.setattr('video_sources.time.time', lambda: 123)
+    buffered = LatestFrameCapture(capture)
+    buffered.thread.join(2)
+    monkeypatch.setattr('video_sources.time.time', lambda: 999)
+    assert buffered.read() == (True, 'frame')
+    assert buffered.delivered_at == 123
+    buffered.release()

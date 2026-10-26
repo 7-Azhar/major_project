@@ -1,0 +1,10 @@
+{
+  "mode": "live",
+  "video_backend": "aura",
+  "video_source": "aura",
+  "aura_port": 8766,
+  "mavlink_endpoint": "udpin:127.0.0.1:14550",
+  "mavlink_baud": 460800,
+  "live_control": false,
+  "live_missions": false
+}

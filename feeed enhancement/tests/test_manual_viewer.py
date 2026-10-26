@@ -4,11 +4,14 @@ import json
 import os
 import shutil
 import tempfile
+from pathlib import Path
 import numpy as np
 import pytest
 
 from app.manual_viewer import ManualViewerApp, ZeroDceOnnxCUDAEnhancer
 from app.pipeline import IdentityProcessor
+
+SAMPLE_VIDEO = str(Path(__file__).resolve().parents[1] / 'samples' / 'test_synthetic.mp4')
 
 
 def test_zero_dce_onnx_cuda_enhancer_fallback():
@@ -27,7 +30,7 @@ def test_zero_dce_onnx_cuda_enhancer_fallback():
 def test_manual_viewer_display_modes():
     """Test frame composition across all viewer modes."""
     app = ManualViewerApp(
-        source="samples/test_synthetic.mp4",
+        source=SAMPLE_VIDEO,
         headless=True,
         max_frames=5,
     )
@@ -65,7 +68,7 @@ def test_manual_viewer_display_modes():
 def test_manual_viewer_enhancer_switching():
     """Test switching enhancers via keys 1-6."""
     app = ManualViewerApp(
-        source="samples/test_synthetic.mp4",
+        source=SAMPLE_VIDEO,
         headless=True,
         max_frames=5,
     )
@@ -82,7 +85,7 @@ def test_manual_viewer_headless_run_and_logging():
     temp_dir = tempfile.mkdtemp()
     try:
         app = ManualViewerApp(
-            source="samples/test_synthetic.mp4",
+            source=SAMPLE_VIDEO,
             initial_enhancer_key="6",
             initial_mode="side_by_side",
             output_dir=temp_dir,

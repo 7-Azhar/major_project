@@ -1,12 +1,22 @@
 # major_project — AURA Flight Vision
 
-A local FPV video workspace: **video / USB camera → image enhancement → object detection → review**.
+A local video intelligence workspace for drone footage, cameras and recordings: **video / USB camera → image enhancement → object detection → review**. FPV overlay exclusion is optional; the project is not restricted to FPV sources.
 
 The main detector is the existing Kaggle-trained **YOLOv8m VisDrone** model. The dashboard includes eight enhancement methods, selectable FPV telemetry exclusion, original/processed comparison, video upload, camera input, playback controls, power on/off, and downloadable review snapshots.
 
 ![AURA dashboard](reports/dashboard/preview.png)
 
+## Integrated ground station
+
+The new **[AURA + Aero Ground Station](ground_station/README.md)** combines this vision pipeline with a detection map, people/vehicle tracking, telemetry, incident logging and recording adapted from [rithinreddy0/aero-ground-station](https://github.com/rithinreddy0/aero-ground-station). The main page focuses on observed objects and brief operator-approved movements; the previous mission planner remains under **Advanced**.
+
+After setting up AURA below, run **Setup Ground Station.cmd** once, then **Start Ground Station.cmd**. Open **http://127.0.0.1:8000/**. Use **Vision controls** to select your video/camera, enhancement, exclusion and playback, or **Vision website** for the separate page. The main station displays the same processed feed. The original **Start AURA.cmd** remains available.
+
+The integrated default uses **real video inference with simulated telemetry**, whose coordinates are withheld from the detection map. Object locations remain unavailable until real aligned telemetry, measured camera calibration and surveyed ground are supplied. Coordinates are estimates with uncertainty, not guaranteed exact GPS. See the [mapping and hardware guide](ground_station/docs/TARGET_MAPPING.md). It opens no aircraft link; live reception is configured separately and flight controls remain disabled by default.
+
 ## Quick start for your friend — Windows
+
+**Continuing development? Read [HANDOVER.md](HANDOVER.md) after setup.** It explains the current architecture, model choice, pending hardware work and verification commands.
 
 1. Install **64-bit Python 3.11** from [python.org](https://www.python.org/downloads/windows/). Include the Python launcher (`py`) during installation.
 2. Get the **whole project**, including its models and sample videos:
@@ -19,7 +29,14 @@ The main detector is the existing Kaggle-trained **YOLOv8m VisDrone** model. The
    Or choose **Code → Download ZIP** on GitHub, then extract the ZIP completely. Do not run the launchers inside the ZIP. This repository includes large model/video assets, so downloading takes longer than a code-only project. Git LFS and submodules are not required.
 
 3. Double-click **Setup AURA.cmd**. Keep the window open while it downloads packages, creates `ML/.venv-portable`, checks the bundled assets, and tests both detection and Zero-DCE. The first setup needs internet and several GB of free space; CUDA packages are particularly large.
-4. When setup reports success, double-click **Start AURA.cmd**. Your browser opens **http://127.0.0.1:8766/**.
+4. For the complete application, also run **Setup Ground Station.cmd** once. Then choose a launcher:
+
+   | Launcher | Opens |
+   | --- | --- |
+   | **Run Both Workspaces.bat** | Detection workspace at **http://127.0.0.1:8000/** and Vision dashboard at **http://127.0.0.1:8766/** |
+   | **Run Vision Dashboard.bat** | Vision dashboard only at **http://127.0.0.1:8766/**; ground-station setup is not required |
+
+   Matching running services are reused so the model is not loaded twice. Vision-only does not stop an already running detection workspace. The older `.cmd` launchers remain available.
 5. Keep the launcher window running. Choose a recording or camera, choose enhancement/detection settings, and press **Play**.
 
 **Do not copy someone else's `.venv` folder.** Setup creates a fresh environment for this laptop. No administrator privileges, Node.js server, API key, paid API, or cloud video service is needed. Python packages and drivers still have to be available on the machine.

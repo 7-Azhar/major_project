@@ -8,6 +8,10 @@ __pycache__/
 *.log
 .local-backups/
 handoff-check/
+external/
+ground_station/.venv/
+ground_station/data/
+ground_station/config.json
 # Local datasets and generated results are recreated by the supplied tools.
 feeed enhancement/data/
 feeed enhancement/logs/

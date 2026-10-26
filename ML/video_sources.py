@@ -2,6 +2,7 @@
 import os
 import re
 import threading
+import time
 
 _camera_readers = {}
 _camera_lock = threading.Lock()
@@ -20,6 +21,7 @@ class LatestFrameCapture:
         self.condition = threading.Condition()
         self.stopped = self.failed = False
         self.frame = None
+        self.frame_at = self.delivered_at = None
         self.received = self.delivered = self.skipped = 0
         self.thread = threading.Thread(target=self._run, daemon=True, name='aura-camera')
         self.thread.start()
@@ -30,6 +32,7 @@ class LatestFrameCapture:
                 with self.condition:
                     if self.stopped:
                         break
+                captured_at = time.time()
                 ok, frame = self.capture.read()
                 with self.condition:
                     if not ok:
@@ -40,6 +43,7 @@ class LatestFrameCapture:
                         break
                     self.received += 1
                     self.frame = frame
+                    self.frame_at = captured_at
                     self.condition.notify_all()
         except Exception:
             # The pipeline reports a failed read with a reconnect action.
@@ -61,6 +65,7 @@ class LatestFrameCapture:
                 return False, None
             self.skipped += max(0, self.received - self.delivered - 1)
             self.delivered = self.received
+            self.delivered_at = self.frame_at
             return True, self.frame
 
     def isOpened(self):

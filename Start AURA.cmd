@@ -9,5 +9,5 @@ if not exist "%AURA_PYTHON%" (
   exit /b 1
 )
 echo Starting AURA. Keep this window open. Ctrl+C stops the server.
-"%AURA_PYTHON%" "ML\dashboard.py" --port 8766 --open-browser
+"%AURA_PYTHON%" "ML\launch_dashboard.py" %*
 if errorlevel 1 pause

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AURA · Detection map</title><link rel="stylesheet" href="/assets/style.css"><link rel="stylesheet" href="/assets/overview.css"></head>
+<body>
+<header class="observation-header">
+  <a class="brand" href="/">✣ <span>AURA<small>OBSERVATION WORKSPACE</small></span></a>
+  <div class="header-actions"><span id="connection" role="status">Connecting…</span><a data-vision-external target="_blank" rel="noopener" aria-disabled="true">Vision website ↗</a><button id="vision-open">Vision controls</button><button id="vision-power" disabled>Vision power</button></div>
+</header>
+<div class="context-bar"><span id="context">Waiting for the local station</span><button id="setup-open" class="small">Hardware & mapping setup</button></div>
+<main class="observation-layout">
+  <section class="observation-main">
+    <section class="map-card">
+      <div class="map-toolbar"><div><span class="eyebrow">PEOPLE & VEHICLES</span><h1>Detection map</h1></div>
+      <div class="map-actions"><button id="sample-map">Preview sample locations</button><button id="fit-detections">Fit observations</button><select id="map-layer" aria-label="Map layer"><option value="offline">Offline grid</option><option value="satellite">Satellite · online</option><option value="street">Street · online</option></select></div></div>
+      <p id="sample-notice" hidden>ILLUSTRATION · These sample locations are synthetic and unrelated to the video feed. Aircraft controls are disabled.</p><div class="map-stage"><canvas id="map" aria-label="Detection map. Estimated objects have uncertainty circles; drag to pan and scroll to zoom."></canvas>
+        <div class="map-info"><span class="map-label" id="map-label">WAITING FOR REAL GPS</span><strong id="aircraft-position">Aircraft position unavailable</strong><small>Object coordinates require camera calibration</small></div>
+        <div class="zoom-controls"><button id="zoom-in" aria-label="Zoom in">＋</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="map-centre" aria-label="Centre on aircraft">⌖</button></div>
+        <div class="map-legend"><span class="legend-dot lime"></span>Person <span class="legend-dot orange"></span>Vehicle <span class="legend-dot blue"></span>Aircraft · circles = estimated error</div>
+        <div id="map-attribution" class="map-attribution"></div><div id="map-scale" class="map-scale"></div>
+        <div id="map-empty">No object locations yet.<small>Detections stay unlocated until real telemetry and calibrated camera geometry are available.</small></div>
+      </div>
+      <div class="mapping-status"><span id="mapping-state">Waiting for video</span><span id="count-summary">0 observations</span></div>
+    </section>
+    <section class="card detections-card">
+      <div class="card-head"><div><h2>Observed objects</h2><p class="micro">Repeated frames update a track. IDs identify observations, not a person's identity.</p></div><a href="/api/observations/geojson" class="text-link">Export map ↗</a></div>
+      <div class="filter-row"><select id="category" aria-label="Detection category"><option value="all">People & vehicles</option><option value="person">People</option><option value="vehicle">Vehicles</option></select><label class="toggle"><input type="checkbox" id="show-dismissed">Show dismissed</label><a href="/api/observations/export">Export observations</a></div>
+      <div id="objects" aria-live="polite"><p class="empty-observations">No detections yet. Open Vision controls and play a recording or connect a capture device.</p></div>
+    </section>
+  </section>
+  <aside class="observation-sidebar">
+    <section class="card camera-card"><div class="card-head"><h2>Processed video</h2><span id="video-badge" class="tag">WAITING</span></div><div class="video-stage"><img id="video" alt="Processed video from the shared AURA pipeline"></div><p id="vision-summary" class="micro">Connecting…</p><div class="camera-tools"><button id="record-start" disabled>● Record</button><button id="record-stop" disabled>■ Stop</button><button id="note-open">Snapshot + note</button></div><p id="record-status" class="micro"></p><a id="record-download" hidden>Download recording ↗</a><p class="micro">Separate workspace: <a id="vision-url" data-vision-external target="_blank" rel="noopener" aria-disabled="true">Connecting…</a></p></section>
+    <section class="card"><div class="card-head"><h2>Aircraft telemetry</h2><span id="telemetry-mode" class="tag">NOT CONNECTED</span></div><div class="telemetry-grid"><div><span>GPS FIX</span><strong id="gps">—</strong><small id="satellites">Waiting for MAVLink</small></div><div><span>BATTERY</span><strong id="battery">—</strong><small id="flight-mode">Firmware not confirmed</small></div><div><span>ALTITUDE</span><strong id="altitude">—</strong><small>Above home · not object height</small></div><div><span>GROUND SPEED</span><strong id="speed">—</strong><small>m/s</small></div></div><p id="telemetry-status" class="micro">ELRS / MAVLink hardware can be connected later.</p></section>
+    <section class="card assistance"><div class="card-head"><h2>Small movements</h2><span class="tag">OPERATOR APPROVED</span></div><p id="suggestion">AI suggestions appear after a persistent person detection.</p><button id="assist-hold" class="accent wide" disabled>Approve brief hold</button><label class="toggle"><input type="checkbox" id="lease" disabled>Enable laptop movement for this tab</label><div class="simple-pad"><button data-command="left" disabled>← Left</button><button data-command="forward" disabled>↑ Forward</button><button data-command="right" disabled>Right →</button><button data-command="backward" disabled>↓ Back</button></div><p class="micro">Each movement request lasts 0.5 seconds. Distance depends on aircraft response. No automatic takeoff, landing or route following.</p><button id="release" class="danger wide">Release laptop control</button><p id="control-status" class="micro">Live control stays disabled until the flight controller is confirmed.</p></section>
+  </aside>
+</main>
+<footer><span>AURA · VIDEO → DETECTION → ESTIMATED LOCATION → REVIEW</span><div><a href="/api/export">Export session log</a> · <a href="/advanced">Advanced / previous mission workspace</a></div></footer>
+<dialog id="vision-dialog"><div class="card-head"><h2>Vision workspace</h2><a data-vision-external target="_blank" rel="noopener" aria-disabled="true">Open separate website ↗</a><button id="vision-close">Return to detection map</button></div><iframe id="vision-frame" title="AURA vision controls"></iframe></dialog>
+<dialog id="note-dialog"><form id="note-form"><h2>Save an observation</h2><label>Note<textarea id="note" required maxlength="2000" placeholder="What do you see?"></textarea></label><p class="micro">Saves the displayed frame when available. Aircraft GPS is recorded separately from any object-location estimate.</p><div class="dialog-actions"><button type="button" id="note-close">Cancel</button><button class="accent">Save note + frame</button></div></form></dialog>
+<dialog id="setup-dialog">
+  <div class="card-head"><h2>Hardware & mapping</h2><button id="setup-close">Close</button></div>
+  <p>The fixed analog camera reaches the laptop through a compatible USB video receiver/capture device. MAVLink reaches the laptop separately over your ELRS telemetry link.</p>
+  <div id="setup-status" class="setup-summary"></div>
+  <h3>Before object GPS can appear</h3>
+  <ol><li>Confirm the flight controller and firmware; configure its MAVLink endpoint.</li><li>Calibrate the camera lens and fixed mounting angles using the actual captured video.</li><li>Survey the ground elevation and flat area; measure video/telemetry delay.</li><li>Validate estimates against known ground points before relying on the map.</li></ol>
+  <p class="micro">The current method estimates a box's bottom-centre on flat ground. It cannot promise exact GPS, handle unknown sloping terrain or infer a hidden person's feet. Recordings are never paired with today's aircraft GPS.</p>
+  <div class="setup-actions"><button id="calibration-download">Download calibration template</button><label>Load measured calibration JSON<input id="calibration-file" type="file" accept=".json"></label></div>
+  <p id="calibration-feedback" role="status"></p>
+  <details><summary>Current calibration</summary><pre id="calibration-current"></pre></details>
+  <p><a href="/mapping-guide" target="_blank" rel="noopener">Read mapping and hardware guide ↗</a></p>
+</dialog>
+<div id="toast" hidden role="status"></div>
+<script type="module" src="/assets/overview.js"></script><script src="/assets/vision.js"></script>
+</body></html>
